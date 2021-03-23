@@ -1,0 +1,17 @@
+
+
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+Class SecurityConfig
+
+@PreAuthorize("values")
+public methode
+    values:
+        -hasRole('ROLE_MASTER') //role
+        -hasAnyRole('ROLE_MASTER, ROLE_ADMIN') // role
+        -hasAuthority('MASTER') //permission
+        -hasAnyAuthority('MASTER, ADMIN') //permission
+
+
+
+-logout must be post request!
+
