@@ -1,14 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <link th:href="@{/css/headerFragment.css}" rel="stylesheet"/>
+    <link th:href="@{/css/globalElements.css}" rel="stylesheet"/>
     <title>Header</title>
 </head>
-<header>
+<header th:fragment="header" id="header">
 
+    <div id="LogoBox">
+        <img th:src="@{/img/EzraLogo.png}" alt="logo" height="60">
+    </div>
 
-    <form action="/logout" method="post">
-        <button type="submit">Logout</button>
-    </form>
+    <nav id="HeaderBox">
+        <div class="NavLinks">
+            <a class="link" href="">Home</a>
+            <a class="link" href="">Boards</a>
+            <a class="link" href="">Events</a>
+            <a class="link" href="">Family</a>
+            <a class="link" href="">Search</a>
+        </div>
+    </nav>
+
+    <div id="ProfileBox">
+        <form action="/logout" method="post">
+            <button type="submit" class="btn">Logout</button>
+        </form>
+    </div>
+
 </header>
 </html>

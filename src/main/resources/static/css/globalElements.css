@@ -1,0 +1,44 @@
+button{
+    -webkit-writing-mode: horizontal-tb !important;
+    text-rendering: auto;
+    color: #FEFEDF;
+    letter-spacing: normal;
+    word-spacing: normal;
+    text-transform: none;
+    text-indent: 0;
+    text-shadow: #4C4452;
+    display: inline-block;
+    text-align: center;
+    align-items: flex-start;
+    cursor: default;
+    background-color: #1D9F91;
+    box-sizing: border-box;
+    margin: 0;
+    font: 400 1.3em 'Roboto';
+    padding: 2px 24px;;
+    border-width: 3px;
+    border-style: unset;
+    border-radius: 5px;
+    border-color: #1D9F91;
+    border-image: initial;
+    transition: width 0.5s, height 0.5s, transform 0.5s;
+}
+
+div{
+    -webkit-box-align: stretch;
+    -webkit-align-items: stretch;
+    align-items: stretch;
+    border: 0 solid #000;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    flex-direction: column;
+    padding: 0;
+    margin: 0;
+    position: relative;
+}
+a{
+    text-decoration: none;
+}

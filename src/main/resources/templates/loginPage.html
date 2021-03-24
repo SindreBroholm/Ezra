@@ -1,10 +1,57 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="author" content="Sindre Broholm Sæther">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link th:href="@{/css/loginPageStyle.css}" rel="stylesheet"/>
+    <link th:href="@{/css/globalElements.css}" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          rel="stylesheet">
     <title>Login Page</title>
 </head>
 <body>
-
+<main class="grid-container">
+    <div id="loginHalf">
+        <div class="loginFormBox">
+            <div class="logoImg">
+                <img th:src="@{/img/EzraLogo.png}" alt="logo" height="70px">
+            </div>
+            <div id="formBox">
+                <form id="loginForm" th:action="@{/login}" method="post">
+                    <div id="loginBoxElements">
+                        <div class="InputBox">
+                            <div class="InputField">
+                                <label class="label" for="username">
+                                    <span class="span">E-mail</span>
+                                    <input id="username" name="username" type="text" class="input">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="InputBox">
+                            <div class="InputField">
+                                <label for="password" class="label">
+                                    <span class="span">Password</span>
+                                    <input id="password" name="password" type="password" class="input">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="InputBox">
+                            <button type="submit">Login</button>
+                        </div>
+                        <div class="InputBox">------------------------|EZRA|-----------------------</div>
+                    </div>
+                    <a href="" class="fgotPass">Forgot password?</a>
+                </form>
+            </div>
+        </div>
+        <div class="loginFormBox">
+            <div>
+                <p>Don't have an account? <a th:href="@{/signup}">Register here</a></p>
+            </div>
+        </div>
+    </div>
+    <div id="imgHalf"></div>
+</main>
 </body>
 </html>

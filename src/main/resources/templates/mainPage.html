@@ -1,9 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="author" content="Sindre Broholm Sæther">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link th:href="@{/css/headerFragment.css}" rel="stylesheet"/>
+    <link th:href="@{/css/globalElements.css}" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          rel="stylesheet">
     <title>Home</title>
 </head>
+<header th:replace="fragments/headerFragment :: header"></header>
 <body>
 
 </body>

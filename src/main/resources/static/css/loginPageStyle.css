@@ -1,0 +1,140 @@
+*{
+    box-sizing: border-box;
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+}
+.grid-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 0.85fr 0.15fr;
+    gap: 0px 0px;
+    grid-template-areas:
+    "img form"
+    ". .";
+}
+#loginHalf{
+    grid-area: form;
+    -webkit-box-flex: 1;
+    flex-grow: 1;
+    -webkit-box-pack: center;
+    justify-content: center;
+    margin-top: 200px;
+    max-width: 350px;
+}
+.loginFormBox{
+    -webkit-box-align: center;
+    align-items: center;
+    border: 1px solid black;
+    border-radius: 1px;
+    margin: 0 0 10px;
+    padding: 10px 0;
+}
+.logoImg{
+    display: flex;
+    justify-content: center;
+    align-content: center;
+}
+#formBox{
+    margin-bottom: 10px;
+    max-width: 350px;
+    width: 100%;
+}
+#loginForm{
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    vertical-align: baseline;
+}
+#loginBoxElements{
+    margin-top: 24px;
+    -webkit-box-flex: 0;
+    flex: 0 0 auto;
+    -webkit-box-pack: start;
+    justify-content: flex-start;
+    -webkit-box-align: stretch;
+    align-items: stretch;
+    align-content: stretch;
+}
+.InputBox{
+    margin:0 40px 6px;
+}
+.InputField{
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-appearance: none;
+    background: gray;
+    border: 1px solid black;
+    border-radius: 3px;
+    color: black;
+    display: flex;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    flex-direction: row;
+    position: relative;
+    width: 100%;
+}
+.label{
+    display: flex;
+    height: 36px;
+    -webkit-box-flex: 1;
+    flex: 1 0 0;
+    padding: 0;
+    position: relative;
+    margin: 0;
+    min-width: 0;
+}
+.span{
+    transform: scale(.83333)
+                translateY(-10px);
+    color: #1D9F91;
+    font-size: 12px;
+    height: 36px;
+    left: 8px;
+    line-height: 36px;
+    overflow: hidden;
+    pointer-events: none;
+    position: absolute;
+    right: 0;
+    text-overflow: ellipsis;
+    transform-origin: left;
+    transition: transform ease-out .1s, -webkit-transform ease-out .1s;
+    user-select: none;
+    white-space: nowrap;
+}
+.input{
+    -webkit-appearance: none;
+    background: white;
+    border: 0;
+    -webkit-box-flex: 1;
+    flex: 1 0 auto;
+    overflow: hidden;
+    outline: 0;
+    text-overflow: ellipsis;
+    line-height: 18px;
+    padding: 14px 0 2px 8px!important;
+}
+
+.fgotPass{
+    color: gray;
+    line-height: 14px;
+    margin-top: 12px;
+    text-align: center;
+}
+#secondHalf{
+
+}
+#imgHalf{
+    grid-area: img;
+    align-self: center;
+    background: url(/img/EzraLogo.png) no-repeat;
+    background-size: 400px;
+    flex-basis: 400px;
+    height: 400px;
+    justify-content: center;
+    margin: 40% 0 0 25%;
+}

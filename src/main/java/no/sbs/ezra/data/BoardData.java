@@ -1,6 +1,7 @@
 package no.sbs.ezra.data;
 
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
@@ -9,6 +10,7 @@ import javax.validation.constraints.Size;
 
 @Entity
 @Data
+@RequiredArgsConstructor
 public class BoardData {
 
     @Id
