@@ -4,7 +4,7 @@
     font-family: 'Roboto', sans-serif;
     font-size: 14px;
 }
-.grid-container {
+.login-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 0.85fr 0.15fr;
@@ -12,6 +12,16 @@
     grid-template-areas:
     "img form"
     ". .";
+}
+.signup-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 0.85fr 0.15fr;
+    gap: 0px 0px;
+    grid-template-areas:
+    ". form ."
+    ". . .";
+    justify-items: center;
 }
 #loginHalf{
     grid-area: form;
@@ -21,6 +31,16 @@
     justify-content: center;
     margin-top: 200px;
     max-width: 350px;
+}
+#signupContainer{
+    grid-area: form;
+    -webkit-box-flex: 1;
+    flex-grow: 1;
+    -webkit-box-pack: center;
+    justify-content: center;
+    margin-top: 100px;
+    max-width: 400px;
+    height: 100%;
 }
 .loginFormBox{
     -webkit-box-align: center;
@@ -39,16 +59,6 @@
     margin-bottom: 10px;
     max-width: 350px;
     width: 100%;
-}
-#loginForm{
-    display: flex;
-    -webkit-box-orient: vertical;
-    -webkit-box-direction: normal;
-    flex-direction: column;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    vertical-align: baseline;
 }
 #loginBoxElements{
     margin-top: 24px;
@@ -124,6 +134,9 @@
     line-height: 14px;
     margin-top: 12px;
     text-align: center;
+}
+.filderror{
+    border: 1px solid red;
 }
 #secondHalf{
 

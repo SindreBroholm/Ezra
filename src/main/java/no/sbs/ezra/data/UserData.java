@@ -2,6 +2,7 @@ package no.sbs.ezra.data;
 
 
 import lombok.Data;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import javax.persistence.Entity;
@@ -21,34 +22,41 @@ public class UserData {
 
     @Email
     @NotEmpty(message = "")
+    @NonNull
     private String email;
 
+    @NotEmpty(message = "")
     @Size(min = 2, max = 150)
-    @NotEmpty
+    @NonNull
     private String firstname;
 
-    @NotEmpty
+    @NotEmpty(message = "")
     @Size(min = 2, max = 150)
+    @NonNull
     private String lastname;
 
+    @NotEmpty(message = "")
     @Size(min = 6, max = 300)
-    @NotEmpty
+    @NonNull
     private String password;
 
+    @NotEmpty(message = "")
     @Size(max = 15, min = 6)
-    @NotEmpty
     private String phone_number;
 
-
-    public UserData(@Email @NotEmpty(message = "") String email,
-                    @Size(min = 2, max = 150) @NotEmpty String firstname,
-                    @NotEmpty @Size(min = 2, max = 150) String lastname,
-                    @Size(min = 6, max = 300) @NotEmpty String password,
-                    @Size(max = 15, min = 6) @NotEmpty String phone_number) {
+    public UserData(@Email @NotEmpty @NonNull String email,
+                    @NotEmpty @Size(min = 2, max = 150) @NonNull String firstname,
+                    @NotEmpty @Size(min = 2, max = 150) @NonNull String lastname,
+                    @NotEmpty @Size(min = 6, max = 300) @NonNull String password,
+                    @NotEmpty @Size(max = 15, min = 6) String phone_number) {
         this.email = email;
         this.firstname = firstname;
         this.lastname = lastname;
         this.password = password;
         this.phone_number = phone_number;
+    }
+
+    public UserData() {
+
     }
 }

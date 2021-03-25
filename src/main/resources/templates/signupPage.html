@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Sindre Broholm Sæther">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link th:href="@{/css/loginPageStyle.css}" rel="stylesheet"/>
+    <link th:href="@{/css/globalElements.css}" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          rel="stylesheet">
+    <title>Login Page</title>
+</head>
+<body>
+<main class="login-container">
+    <div id="loginHalf">
+        <div class="loginFormBox">
+            <div class="logoImg">
+                <img th:src="@{/img/EzraLogo.png}" alt="logo" height="70px">
+            </div>
+            <div id="formBox">
+                <form th:action="@{/signup}" method="post" th:object="${UserData}">
+                    <div id="loginBoxElements">
+                        <div class="InputBox">
+                            <div class="InputField">
+                                <label class="label">
+                                    <span class="span">E-mail</span>
+                                    <input type="text" class="input" th:field="*{email}" th:errorclass="filderror">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="InputBox">
+                            <div class="InputField">
+                                <label class="label">
+                                    <span class="span">Firstname</span>
+                                    <input type="text" class="input" th:field="*{firstname}" th:errorclass="filderror">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="InputBox">
+                            <div class="InputField">
+                                <label class="label">
+                                    <span class="span">Lastname</span>
+                                    <input type="text" class="input" th:field="*{lastname}" th:errorclass="filderror">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="InputBox">
+                            <div class="InputField">
+                                <label class="label">
+                                    <span class="span">Phone number</span>
+                                    <input type="text" class="input" th:field="*{phone_number}" th:errorclass="filderror">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="InputBox">
+                            <div class="InputField">
+                                <label class="label">
+                                    <span class="span">Password</span>
+                                    <input type="password" class="input" th:field="*{password}" th:errorclass="filderror">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="InputBox">
+                            <button type="submit">Signup</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="loginFormBox">
+            <div>
+                <p>Already have an account? <a th:href="@{/login}">Login here</a></p>
+            </div>
+        </div>
+    </div>
+    <div id="imgHalf"></div>
+</main>
+</body>
+</html>
