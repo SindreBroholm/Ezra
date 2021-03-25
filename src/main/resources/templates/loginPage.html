@@ -24,7 +24,7 @@
                             <div class="InputField">
                                 <label class="label" for="username">
                                     <span class="span">E-mail</span>
-                                    <input id="username" name="username" type="text" class="input">
+                                    <input id="username" name="username" type="text" class="input" autofocus="autofocus">
                                 </label>
                             </div>
                         </div>
@@ -53,5 +53,13 @@
     </div>
     <div id="imgHalf"></div>
 </main>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var username = /*[[${username}]]*/ 'a';
+    if (username !== 'a'){
+        document.getElementById("username").value = username
+    }
+    /*]]>*/
+</script>
 </body>
 </html>

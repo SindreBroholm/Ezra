@@ -49,24 +49,21 @@ public class AccessController {
     }
 
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
-    public String createNewUser(@Valid @ModelAttribute("UserData") UserData userData, BindingResult br, RedirectAttributes redirectAttributes, Model model){
+    public String createNewUser(@Valid @ModelAttribute("UserData") UserData userData, BindingResult br,
+                                RedirectAttributes redirectAttributes){
         UserDataValidator validation = new UserDataValidator(userDataRepository);
-        logger.info(userData.toString());
         if (validation.supports(userData.getClass())) {
-            logger.info("starting validation");
-            logger.info(userData.toString());
             validation.validate(userData, br);
         } else {
             logger.error("Failed to support UserData class and or validate UserData");
         }
         if (br.hasErrors()) {
-            logger.error("Validation failed, errorCount:" + br.getErrorCount() +"\n"+ br.getAllErrors());
             return "signupPage";
         } else {
             userData.setPassword(passwordEncoder.passwordEncoder().encode(userData.getPassword()));
             userDataRepository.save(userData);
-            logger.info("User successfully signed up");
-            redirectAttributes.addFlashAttribute("user", userData);
+            logger.info(userData.getEmail()+" successfully signed up");
+            redirectAttributes.addFlashAttribute("username", userData.getEmail());
             return "redirect:/login";
         }
     }
