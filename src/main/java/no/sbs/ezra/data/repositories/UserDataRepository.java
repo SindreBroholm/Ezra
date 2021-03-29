@@ -1,4 +1,4 @@
-package no.sbs.ezra.repositories;
+package no.sbs.ezra.data.repositories;
 
 import no.sbs.ezra.data.UserData;
 import no.sbs.ezra.security.auth.CustomUserDetails;

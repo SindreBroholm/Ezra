@@ -1,7 +1,7 @@
 package no.sbs.ezra.security.auth;
 
 import no.sbs.ezra.data.UserData;
-import no.sbs.ezra.repositories.UserDataRepository;
+import no.sbs.ezra.data.repositories.UserDataRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

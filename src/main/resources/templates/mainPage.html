@@ -5,13 +5,54 @@
     <meta name="author" content="Sindre Broholm Sæther">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link th:href="@{/css/headerFragment.css}" rel="stylesheet"/>
-    <link th:href="@{/css/globalElements.css}" rel="stylesheet"/>
+    <link th:href="@{/css/mainPageStyles.css}" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
           rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.5.1/main.css" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.5.1/main.min.js"></script>
     <title>Home</title>
 </head>
-<header th:replace="fragments/headerFragment :: header"></header>
 <body>
+<header th:replace="fragments/headerFragment :: header"></header>
+<article id="main-grid-container">
+    <section class="today">
+        <p>Today</p>
+    </section>
+    <main class="main">
+        <div id='calendar'></div>
+    </main>
+    <section class="thisMonth">
+        <p>This Month</p>
+    </section>
+</article>
+<script>
 
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            headerToolbar: { center: 'dayGridMonth,timeGridWeek' },
+            initialView: 'dayGridMonth',
+            nextDayThreshold: '00:00:00',
+            eventTimeFormat: { // like '14:30'
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            },
+            events: [
+                {
+                    start: '2021-03-27T14:30:00',
+                    display: 'list-item'
+                }
+            ],
+
+        });
+
+        calendar.on('dateClick', function(info) {
+            console.log('clicked on ' + info.dateStr);
+        });
+        calendar.render();
+    });
+
+</script>
 </body>
 </html>

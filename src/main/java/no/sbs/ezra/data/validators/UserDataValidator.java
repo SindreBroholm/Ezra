@@ -3,7 +3,7 @@ package no.sbs.ezra.data.validators;
 import lombok.NonNull;
 import no.sbs.ezra.data.UserData;
 
-import no.sbs.ezra.repositories.UserDataRepository;
+import no.sbs.ezra.data.repositories.UserDataRepository;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;

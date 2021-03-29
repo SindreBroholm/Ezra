@@ -1,0 +1,23 @@
+#main-grid-container {
+    display: grid;
+    grid-template-columns: 0.5fr 1fr 0.5fr;
+    grid-template-rows: 1.8fr 0.2fr;
+    gap: 0px 0px;
+    grid-template-areas:
+    "today main thisMonth"
+    ". . .";
+    margin-top: 50px;
+}
+
+.main{
+    grid-area: main;
+    max-width: 100%;
+}
+.today{
+    grid-area: today;
+    width: 100%;
+}
+.thisMonth{
+    grid-area: thisMonth;
+    width: 100%;
+}

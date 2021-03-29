@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Sindre Broholm Sæther">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link th:href="@{/css/headerFragment.css}" rel="stylesheet"/>
+    <title>Boards</title>
+</head>
+<body>
+<header th:replace="fragments/headerFragment :: header"></header>
+<main>
+    <div>
+        <div>
+            <form th:action="@{/searchForBoard}" method="post">
+                <label for="keyword"></label>
+                <input type="text" name="keyword" id="keyword" th:value="${keyword}" placeholder="Search for board"/>
+                <button type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+    <div>
+        <div th:each="board : ${searchResults}" th:object="${board}">
+            <h2 th:text="*{name}"></h2>
+            <p th:text="*{contactName}"></p>
+        </div>
+    </div>
+
+</main>
+<script type="text/javascript">
+
+</script>
+</body>
+</html>

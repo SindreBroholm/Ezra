@@ -1,9 +1,4 @@
-*{
-    box-sizing: border-box;
-    margin: 0;
-    font-family: 'Roboto', sans-serif;
-    font-size: 14px;
-}
+
 .login-container {
     display: grid;
     grid-template-columns: 1fr 1fr;

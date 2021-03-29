@@ -1,8 +1,10 @@
 package no.sbs.ezra.controllers;
 
+import no.sbs.ezra.data.BoardData;
 import no.sbs.ezra.data.UserData;
+import no.sbs.ezra.data.repositories.BoardDataRepository;
 import no.sbs.ezra.data.validators.UserDataValidator;
-import no.sbs.ezra.repositories.UserDataRepository;
+import no.sbs.ezra.data.repositories.UserDataRepository;
 import no.sbs.ezra.security.PasswordConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,8 +14,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
+import java.util.List;
 
 
 @Controller
@@ -23,11 +25,13 @@ public class AccessController {
 
     private final PasswordConfig passwordEncoder;
     private final UserDataRepository userDataRepository;
+    private final BoardDataRepository boardDataRepository;
 
 
-    public AccessController(PasswordConfig passwordEncoder, UserDataRepository userDataRepository) {
+    public AccessController(PasswordConfig passwordEncoder, UserDataRepository userDataRepository, BoardDataRepository boardDataRepository) {
         this.passwordEncoder = passwordEncoder;
         this.userDataRepository = userDataRepository;
+        this.boardDataRepository = boardDataRepository;
     }
 
     @GetMapping("/")
@@ -38,7 +42,6 @@ public class AccessController {
 
     @GetMapping("/login")
     public String getLoginPage(){
-
         return "loginPage";
     }
 
@@ -67,4 +70,25 @@ public class AccessController {
             return "redirect:/login";
         }
     }
+
+    @GetMapping("/boards")
+    public String getBoardsPage(){
+
+
+
+        return "boardsPage";
+    }
+    @RequestMapping(value = "/searchForBoard", method = RequestMethod.POST)
+    public String searchForBoards(Model model, @RequestParam() String keyword) {
+        List<BoardData> searchResults;
+        if (keyword != null) {
+            searchResults = boardDataRepository.search(keyword);
+        } else {
+            searchResults = (List<BoardData>) boardDataRepository.findAll();
+        }
+        model.addAttribute("searchResults", searchResults);
+        model.addAttribute("keyword", keyword);
+        return "boardsPage";
+    }
+
 }

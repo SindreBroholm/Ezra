@@ -1,3 +1,9 @@
+*{
+    box-sizing: border-box;
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+}
 button{
     -webkit-writing-mode: horizontal-tb !important;
     text-rendering: auto;
@@ -51,4 +57,7 @@ form{
     padding: 0;
     border: 0;
     vertical-align: baseline;
+}
+h1{
+    font-size: 4em;
 }
