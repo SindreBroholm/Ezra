@@ -1,0 +1,27 @@
+.boards-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 0.15fr 0.85fr ;
+    gap: 0px 0px;
+    grid-template-areas:
+    ". search ."
+    ". result .";
+    justify-items: center;
+}
+
+.outerSearchDiv{
+    grid-area: search;
+}
+.innerSearchDiv{
+    flex-direction: column;
+}
+.outerResultDiv{
+    grid-area: result;
+    width: 100%;
+    justify-content: center;
+    align-content: center;
+    text-align: center;
+}
+.searchResults{
+    border-bottom: 1px solid black;
+}

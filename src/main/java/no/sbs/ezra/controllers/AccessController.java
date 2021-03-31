@@ -2,10 +2,14 @@ package no.sbs.ezra.controllers;
 
 import no.sbs.ezra.data.BoardData;
 import no.sbs.ezra.data.UserData;
+import no.sbs.ezra.data.UserRole;
 import no.sbs.ezra.data.repositories.BoardDataRepository;
+import no.sbs.ezra.data.repositories.UserRoleRepository;
+import no.sbs.ezra.data.validators.BoardDataValidator;
 import no.sbs.ezra.data.validators.UserDataValidator;
 import no.sbs.ezra.data.repositories.UserDataRepository;
 import no.sbs.ezra.security.PasswordConfig;
+import no.sbs.ezra.security.UserPermission;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -15,7 +19,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
+import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @Controller
@@ -26,17 +33,29 @@ public class AccessController {
     private final PasswordConfig passwordEncoder;
     private final UserDataRepository userDataRepository;
     private final BoardDataRepository boardDataRepository;
+    private final UserRoleRepository userRoleRepository;
 
 
-    public AccessController(PasswordConfig passwordEncoder, UserDataRepository userDataRepository, BoardDataRepository boardDataRepository) {
+    public AccessController(PasswordConfig passwordEncoder, UserDataRepository userDataRepository, BoardDataRepository boardDataRepository, UserRoleRepository userRoleRepository) {
         this.passwordEncoder = passwordEncoder;
         this.userDataRepository = userDataRepository;
         this.boardDataRepository = boardDataRepository;
+        this.userRoleRepository = userRoleRepository;
     }
 
     @GetMapping("/")
-    public String homePage(){
+    public String homePage(Model model, Principal principal){
+        UserData user = userDataRepository.findByEmail(principal.getName());
 
+        List<UserRole> listOfUserRoles = userRoleRepository.findAllByUserId(user.getId());
+        List<BoardData> boards = new ArrayList<>();
+        for (UserRole ur :
+                listOfUserRoles) {
+            Optional<BoardData> temp = boardDataRepository.findById(ur.getBoardId());
+            boards.add(temp.orElseThrow());
+        }
+
+        model.addAttribute("myBoards", boards);
         return "mainPage";
     }
 
@@ -73,9 +92,6 @@ public class AccessController {
 
     @GetMapping("/boards")
     public String getBoardsPage(){
-
-
-
         return "boardsPage";
     }
     @RequestMapping(value = "/searchForBoard", method = RequestMethod.POST)
@@ -86,9 +102,41 @@ public class AccessController {
         } else {
             searchResults = (List<BoardData>) boardDataRepository.findAll();
         }
+        if (searchResults.size() == 0){
+            searchResults.add( new BoardData("noResult", "noName", "00000000", "noEmail@no.no", "noPage"));
+        }
         model.addAttribute("searchResults", searchResults);
         model.addAttribute("keyword", keyword);
         return "boardsPage";
+    }
+
+    @GetMapping("/newBoard")
+    public String createNewBoard(Model model, Principal principal){
+        model.addAttribute("user", userDataRepository.findByEmail(principal.getName()));
+        model.addAttribute("BoardData", new BoardData());
+        return "newBoardPage";
+    }
+
+    @RequestMapping(value = "/createBoard", method = RequestMethod.POST)
+    public String createNewBoard(@Valid @ModelAttribute("BoardData") BoardData boardData, BindingResult br,
+                                 RedirectAttributes redirectAttributes, Principal principal, Model model){
+        BoardDataValidator validator = new BoardDataValidator(boardDataRepository);
+        UserData user = userDataRepository.findByEmail(principal.getName());
+        model.addAttribute("user", user);
+        if (validator.supports(boardData.getClass())) {
+            validator.validate(boardData, br);
+        } else {
+            logger.error("Failed to support BoardData class and or validate BoardData");
+        }
+        if (br.hasErrors()) {
+            return "newBoardPage";
+        } else {
+            boardDataRepository.save(boardData);
+            logger.info(boardData.getName() + " was successfully created by: " + userDataRepository.findByEmail(principal.getName()));
+            userRoleRepository.save(new UserRole(user.getId(), boardData.getId(), UserPermission.MASTER, false));
+            logger.info("UserRole appended successfully");
+        }
+        return "redirect:/";
     }
 
 }

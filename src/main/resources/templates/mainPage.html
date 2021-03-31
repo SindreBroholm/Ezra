@@ -10,19 +10,22 @@
           rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.5.1/main.css" rel="stylesheet"/>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.5.1/main.min.js"></script>
-    <title>Home</title>
+    <title>Ezra</title>
 </head>
 <body>
 <header th:replace="fragments/headerFragment :: header"></header>
 <article id="main-grid-container">
-    <section class="today">
-        <p>Today</p>
+    <section class="leftOfMain">
+        <p>My boards</p>
+        <div th:each="board: ${myBoards}">
+            <a href=""><span th:text="${board.name}"></span></a>
+        </div>
     </section>
     <main class="main">
         <div id='calendar'></div>
     </main>
-    <section class="thisMonth">
-        <p>This Month</p>
+    <section class="rightOfMain">
+        <p>Events today</p>
     </section>
 </article>
 <script>

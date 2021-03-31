@@ -5,24 +5,32 @@
     <meta name="author" content="Sindre Broholm Sæther">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link th:href="@{/css/headerFragment.css}" rel="stylesheet"/>
-    <title>Boards</title>
+    <link th:href="@{/css/globalElements.css}" rel="stylesheet"/>
+    <link th:href="@{/css/boardsPaageStyles.css}" rel="stylesheet"/>
+    <title>Ezra</title>
 </head>
 <body>
 <header th:replace="fragments/headerFragment :: header"></header>
-<main>
-    <div>
-        <div>
+<main class="boards-container">
+    <div class="outerSearchDiv">
+        <div class="innerSearchDiv">
             <form th:action="@{/searchForBoard}" method="post">
                 <label for="keyword"></label>
                 <input type="text" name="keyword" id="keyword" th:value="${keyword}" placeholder="Search for board"/>
                 <button type="submit">Search</button>
+                <a th:href="@{/newBoard}">Creat new</a>
             </form>
         </div>
     </div>
-    <div>
+    <div class="outerResultDiv">
         <div th:each="board : ${searchResults}" th:object="${board}">
-            <h2 th:text="*{name}"></h2>
-            <p th:text="*{contactName}"></p>
+            <div class="searchResults" th:if="*{!name.equals('noResult')}">
+                <h2 th:text="*{name}"></h2>
+                <p th:text="*{contactName}"></p>
+            </div>
+            <div class="searchResults" th:if="*{name.equals('noResult')}">
+                <h3>No board match that search!</h3>
+            </div>
         </div>
     </div>
 

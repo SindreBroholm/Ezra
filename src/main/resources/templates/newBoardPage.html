@@ -15,61 +15,57 @@
     <div id="loginHalf">
         <div class="loginFormBox">
             <div class="logoImg">
-                <h1>Sign up!</h1>
+                <!--<img th:src="@{/img/EzraLogo.png}" alt="logo" height="70px">-->
+                <h1>New board</h1>
             </div>
             <div id="formBox">
-                <form th:action="@{/signup}" method="post" th:object="${UserData}">
+                <form th:action="@{/createBoard}" method="post" th:object="${BoardData}">
                     <div id="loginBoxElements">
                         <div class="InputBox">
                             <div class="InputField">
                                 <label class="label">
-                                    <span class="span">E-mail</span>
-                                    <input type="text" class="input" th:field="*{email}" th:errorclass="filderror" autofocus="autofocus">
+                                    <span class="span">Name</span>
+                                    <input type="text" class="input" th:field="*{name}" th:errorclass="filderror" autofocus="autofocus">
                                 </label>
                             </div>
                         </div>
                         <div class="InputBox">
                             <div class="InputField">
                                 <label class="label">
-                                    <span class="span">Firstname</span>
-                                    <input type="text" class="input" th:field="*{firstname}" th:errorclass="filderror">
+                                    <span class="span">Contact name</span>
+                                    <input type="text" class="input" th:field="*{contactName}" th:placeholder="${user.firstname + ' ' + user.lastname}" th:errorclass="filderror">
                                 </label>
                             </div>
                         </div>
                         <div class="InputBox">
                             <div class="InputField">
                                 <label class="label">
-                                    <span class="span">Lastname</span>
-                                    <input type="text" class="input" th:field="*{lastname}" th:errorclass="filderror">
+                                    <span class="span">Contact phone number</span>
+                                    <input type="text" class="input" th:field="*{contactNumber}" th:placeholder="${user.phone_number}" th:errorclass="filderror">
                                 </label>
                             </div>
                         </div>
                         <div class="InputBox">
                             <div class="InputField">
                                 <label class="label">
-                                    <span class="span">Phone number</span>
-                                    <input type="text" class="input" th:field="*{phone_number}" th:errorclass="filderror">
+                                    <span class="span">Contact e-mail</span>
+                                    <input type="text" class="input" th:field="*{contactEmail}" th:placeholder="${user.email}" th:errorclass="filderror">
                                 </label>
                             </div>
                         </div>
                         <div class="InputBox">
                             <div class="InputField">
                                 <label class="label">
-                                    <span class="span">Password</span>
-                                    <input type="password" class="input" th:field="*{password}" th:errorclass="filderror">
+                                    <span class="span">Homepage</span>
+                                    <input type="text" class="input" th:field="*{homepage}" th:errorclass="filderror">
                                 </label>
                             </div>
                         </div>
                         <div class="InputBox">
-                            <button type="submit">Signup</button>
+                            <button type="submit">Create</button>
                         </div>
                     </div>
                 </form>
-            </div>
-        </div>
-        <div class="loginFormBox">
-            <div>
-                <p>Already have an account? <a th:href="@{/login}">Login here</a></p>
             </div>
         </div>
     </div>

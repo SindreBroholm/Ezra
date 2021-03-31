@@ -4,7 +4,7 @@
     grid-template-rows: 1.8fr 0.2fr;
     gap: 0px 0px;
     grid-template-areas:
-    "today main thisMonth"
+    "left main right"
     ". . .";
     margin-top: 50px;
 }
@@ -13,11 +13,11 @@
     grid-area: main;
     max-width: 100%;
 }
-.today{
-    grid-area: today;
+.leftOfMain{
+    grid-area: left;
     width: 100%;
 }
-.thisMonth{
-    grid-area: thisMonth;
+.rightOfMain{
+    grid-area: right;
     width: 100%;
 }
