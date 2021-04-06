@@ -20,35 +20,24 @@ public class UserData {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Email
-    @NotEmpty(message = "")
     @NonNull
+    @Email(message = "Please enter a valid e-mail address")
     private String email;
 
-    @NotEmpty(message = "")
-    @Size(min = 2, max = 150)
     @NonNull
     private String firstname;
 
-    @NotEmpty(message = "")
-    @Size(min = 2, max = 150)
     @NonNull
     private String lastname;
 
-    @NotEmpty(message = "")
-    @Size(min = 6, max = 300)
     @NonNull
     private String password;
 
-    @NotEmpty(message = "")
-    @Size(max = 15, min = 6)
     private String phone_number;
 
-    public UserData(@Email @NotEmpty @NonNull String email,
-                    @NotEmpty @Size(min = 2, max = 150) @NonNull String firstname,
-                    @NotEmpty @Size(min = 2, max = 150) @NonNull String lastname,
-                    @NotEmpty @Size(min = 6, max = 300) @NonNull String password,
-                    @NotEmpty @Size(max = 15, min = 6) String phone_number) {
+    public UserData(@NonNull String email, @NonNull String firstname,
+                    @NonNull String lastname, @NonNull String password,
+                    String phone_number) {
         this.email = email;
         this.firstname = firstname;
         this.lastname = lastname;
@@ -56,7 +45,5 @@ public class UserData {
         this.phone_number = phone_number;
     }
 
-    public UserData() {
-
-    }
+    public UserData() {}
 }

@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -67,12 +68,13 @@ public class AccessController {
     @GetMapping("/signup")
     public String getSignupPage(Model model){
         model.addAttribute("UserData", new UserData());
+        model.addAttribute("errors", new ArrayList());
         return "signupPage";
     }
 
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
     public String createNewUser(@Valid @ModelAttribute("UserData") UserData userData, BindingResult br,
-                                RedirectAttributes redirectAttributes){
+                                RedirectAttributes redirectAttributes, Model model){
         UserDataValidator validation = new UserDataValidator(userDataRepository);
         if (validation.supports(userData.getClass())) {
             validation.validate(userData, br);
@@ -80,6 +82,13 @@ public class AccessController {
             logger.error("Failed to support UserData class and or validate UserData");
         }
         if (br.hasErrors()) {
+            List<ObjectError> allErrors = br.getAllErrors();
+            List<String> errors = new ArrayList<>();
+            for (ObjectError e :
+                    allErrors) {
+                errors.add(e.getDefaultMessage());
+            }
+            model.addAttribute("errors", errors);
             return "signupPage";
         } else {
             userData.setPassword(passwordEncoder.passwordEncoder().encode(userData.getPassword()));
