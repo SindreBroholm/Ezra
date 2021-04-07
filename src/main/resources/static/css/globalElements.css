@@ -47,6 +47,7 @@ div{
 }
 a{
     text-decoration: none;
+    color: black;
 }
 form{
     display: flex;
@@ -60,4 +61,7 @@ form{
 }
 h1{
     font-size: 4em;
+}
+h2 {
+    font-size: 1.5em;
 }

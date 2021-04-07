@@ -1,0 +1,72 @@
+#main-grid-container {
+    display: grid;
+    grid-template-columns: 0.5fr 1fr 0.5fr;
+    grid-template-rows: 1.8fr 0.2fr;
+    gap: 0px 0px;
+    grid-template-areas:
+    "left main right"
+    ". . .";
+    margin-top: 50px;
+}
+
+.main {
+    grid-area: main;
+    max-width: 100%;
+}
+
+.leftOfMain {
+    grid-area: left;
+    width: 100%;
+}
+
+#boardSection {
+    -webkit-box-flex: 1;
+    flex-grow: 1;
+    -webkit-box-pack: center;
+    justify-content: center;
+    width: 100%;
+    padding: 0 30px;
+
+}
+
+.boardBox {
+    -webkit-box-align: center;
+    align-items: center;
+    border: 1px solid black;
+    border-radius: 1px;
+    margin: 0 0 10px;
+    padding: 10px 0;
+}
+
+.infoBox {
+    max-width: 100%;
+    width: 100%;
+    padding: 12px 0;
+}
+
+#infoElements {
+    margin-top: 24px;
+    -webkit-box-flex: 0;
+    flex: 0 0 auto;
+    -webkit-box-pack: start;
+    justify-content: flex-start;
+    -webkit-box-align: stretch;
+    align-items: stretch;
+    align-content: stretch;
+    padding: 5px 0;
+}
+
+.infoField {
+    font-size: 10px;
+    color: gray;
+}
+
+.infoInput {
+    font-weight: bolder;
+}
+
+
+.rightOfMain {
+    grid-area: right;
+    width: 100%;
+}

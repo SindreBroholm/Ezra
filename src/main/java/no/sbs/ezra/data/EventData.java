@@ -22,7 +22,6 @@ public class EventData {
     private int id;
 
     @ManyToOne
-    @NotNull
     private BoardData board;
 
     @Size(max = 5000)
@@ -51,7 +50,7 @@ public class EventData {
     @NotEmpty
     @Size(max = 150)
     @NotNull
-    private String name;
+    private String eventName;
 
     public EventData(@NotNull BoardData board,
                      @Size(max = 5000) @NotNull String message,
@@ -60,7 +59,7 @@ public class EventData {
                      @NotNull LocalDateTime datetime_created,
                      @NotNull UserPermission membershipType,
                      String location,
-                     @NotEmpty @Size(max = 150) @NotNull String name) {
+                     @NotEmpty @Size(max = 150) @NotNull String eventName) {
         this.board = board;
         this.message = message;
         this.datetime_from = datetime_from;
@@ -68,6 +67,6 @@ public class EventData {
         this.datetime_created = datetime_created;
         this.membershipType = membershipType;
         this.location = location;
-        this.name = name;
+        this.eventName = eventName;
     }
 }

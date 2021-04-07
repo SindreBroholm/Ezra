@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Sindre Broholm Sæther">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link th:href="@{/css/headerFragment.css}" rel="stylesheet"/>
+    <link th:href="@{/css/loginPageStyle.css}" rel="stylesheet"/>
+    <link th:href="@{/css/globalElements.css}" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          rel="stylesheet">
+    <title>Ezra</title>
+</head>
+<body>
+<header th:replace="fragments/headerFragment :: header"></header>
+<main class="login-container">
+    <div id="loginHalf">
+        <div class="loginFormBox">
+            <div class="logoImg">
+                <h1>Sign up!</h1>
+            </div>
+            <div id="formBox">
+                <form th:action="@{'/createEvent/'+${board.id}}" method="post" th:object="${eventData}">
+                    <div id="loginBoxElements">
+                        <div class="InputBox">
+                            <div class="InputField">
+                                <label class="label">
+                                    <span class="span">Event name</span>
+                                    <input type="text" class="input" th:field="*{eventName}" th:errorclass="filderror" autofocus="autofocus">
+                                    <input type="text" class="input" th:field="*{board}" th:errorclass="filderror" th:value="${board}" hidden>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="InputBox">
+                            <div class="InputField">
+                                <label class="label">
+                                    <span class="span">Description</span>
+                                    <input type="text" class="input" th:field="*{message}" th:errorclass="filderror">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="InputBox">
+                            <div class="InputField">
+                                <label class="label">
+                                    <span class="span">Location</span>
+                                    <input type="text" class="input" th:field="*{location}" th:errorclass="filderror">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="InputBox">
+                            <div class="InputField">
+                                <label class="label">
+                                    <span class="span">Start</span>
+                                    <input type="datetime-local" class="input" th:field="*{datetime_from}" th:errorclass="filderror">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="InputBox">
+                            <div class="InputField">
+                                <label class="label">
+                                    <span class="span">End</span>
+                                    <input type="datetime-local" class="input" th:field="*{datetime_to}" th:errorclass="filderror">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="InputBox">
+                            <div class="radioButtonsBox">
+                                    <span>Who can see this event?</span>
+                                <label>Admin
+                                    <input type="radio" th:field="*{membershipType}" th:errorclass="filderror" th:value="${T(no.sbs.ezra.security.UserPermission).ADMIN}">
+                                </label>
+                                <label>Members
+                                    <input type="radio" th:field="*{membershipType}" th:errorclass="filderror" th:value="${T(no.sbs.ezra.security.UserPermission).MEMBER}">
+                                </label>
+                                <label>Followers
+                                    <input type="radio" th:field="*{membershipType}" th:errorclass="filderror" th:value="${T(no.sbs.ezra.security.UserPermission).FOLLOWER}">
+                                </label>
+                                <label>Everyone
+                                    <input type="radio" th:field="*{membershipType}" th:errorclass="filderror" th:value="${T(no.sbs.ezra.security.UserPermission).VISITOR}">
+                                </label>
+                            </div>
+                        </div>
+                        <div th:if="${#fields.hasErrors()}">
+                            <span id="hasErrors"></span>
+                        </div>
+                        <div class="InputBox">
+                            <button type="submit">Create</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="imgHalf"></div>
+</main>
+</body>
+</html>

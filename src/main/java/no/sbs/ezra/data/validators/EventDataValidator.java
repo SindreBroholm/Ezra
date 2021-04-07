@@ -24,13 +24,12 @@ public class EventDataValidator implements Validator {
 
     @Override
     public void validate(@NonNull Object o, @NonNull Errors errors) {
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "board", "board.empty", "BoardDataId Empty");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "message", "message.empty", "Description is Empty");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "datetime_from", "datetime_from.empty", "An event must have a start time");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "datetime_to", "datetime_to.empty", "An event must have a ending time");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "datetime_created", "datetime_created.empty", "Failed to timestamp event");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "membershipType", "membershipType.empty", "You must specify who this event is for");
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "name", "name.empty", "The event must have a name");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "eventName", "eventName.empty", "The event must have a name");
 
         EventData event = (EventData) o;
 
@@ -40,11 +39,12 @@ public class EventDataValidator implements Validator {
         if (event.getDatetime_from().isBefore(LocalDateTime.now())){
             errors.rejectValue("datetime_from", "datetime_from.error", "Event start is set in the past");
         }
-        if (event.getDatetime_to().isAfter(event.getDatetime_from())){
+        if (event.getDatetime_to().isBefore(event.getDatetime_from())){
             errors.rejectValue("datetime_to", "datetime_to.error", "Event cant end before it has started");
         }
-        if (event.getName().length() > 150){
-            errors.rejectValue("name", "name.error", "Event name is to long");
+        if (event.getEventName().length() > 150){
+            errors.rejectValue("eventName", "eventName.error", "Event name is to long");
         }
+
     }
 }

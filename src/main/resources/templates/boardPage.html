@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Sindre Broholm Sæther">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link th:href="@{/css/headerFragment.css}" rel="stylesheet"/>
+    <link th:href="@{/css/boardPageStyles.css}" rel="stylesheet"/>
+    <link th:href="@{/css/globalElements.css}" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          rel="stylesheet">
+    <title>Ezra</title>
+</head>
+<body>
+<header th:replace="fragments/headerFragment :: header"></header>
+<div th:if="${userPermission.getPermission().equals('master')}">
+    <div>
+        <a th:href="@{'/createEvent/' + ${board.id}}">New event</a>
+    </div>
+</div>
+<main id="main-grid-container">
+    <!--info-->
+    <section class="leftOfMain" th:object="${board}">
+        <div id="boardSection">
+            <div class="boardBox">
+                <div class="logoImg">
+                    <h2 th:text="*{name}">Welcome</h2>
+                </div>
+                <div id="infoBox">
+                    <div id="infoElements">
+                        <div class="infoBox">
+                            <div class="InputField">
+                                <span class="infoField">Contact person</span>
+                                <span class="infoInput" th:text="*{contactName}"></span>
+                            </div>
+                        </div>
+                        <div class="infoBox">
+                            <div class="InputField">
+                                <span class="infoField">E-mail</span>
+                                <span class="infoInput" th:text="*{contactEmail}"></span>
+                            </div>
+                        </div>
+                        <div class="infoBox">
+                            <div class="InputField">
+                                <span class="infoField">Phone</span>
+                                <span class="infoInput" th:text="*{contactNumber}"></span>
+                            </div>
+                        </div>
+                        <div class="infoBox">
+                            <div class="InputField">
+                                <span class="infoField">Homepage</span>
+                                <span th:text="*{homepage}"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!--posts-->
+    <section class="main">
+        <div id='calendar'></div>
+    </section>
+
+    <!--events-->
+    <section class="rightOfMain">
+        <table>
+            <caption>Upcoming events</caption>
+            <tr>
+                <td th:each="event : ${events}" th:object="${event}">
+                    <span th:text="*{eventName}"></span>
+                </td>
+            </tr>
+        </table>
+    </section>
+
+</main>
+
+</body>
+</html>

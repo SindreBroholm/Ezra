@@ -4,10 +4,12 @@ import no.sbs.ezra.data.EventData;
 import no.sbs.ezra.data.UserRole;
 import no.sbs.ezra.data.repositories.EventDataRepository;
 import no.sbs.ezra.data.repositories.UserRoleRepository;
+import no.sbs.ezra.security.UserPermission;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 public class EventToJsonService {
@@ -44,7 +46,7 @@ public class EventToJsonService {
             events.addAll(
                     eventDataRepository.findAllByBoardIdAndAndMembershipType(
                             ur.getBoardId(),
-                            ur.getMembershipType().getPermission().toString()
+                            UserPermission.valueOf(ur.getMembershipType().getPermission().toUpperCase(Locale.ROOT))
                     ));
         }
 
@@ -52,7 +54,7 @@ public class EventToJsonService {
             if ( i < events.size() -1){
                 allEventsToUser.add(object
                         .append("{\n")
-                        .append("title: '").append(events.get(i).getName()).append("',\n")
+                        .append("title: '").append(events.get(i).getEventName()).append("',\n")
                         .append("description: '").append(events.get(i).getMessage()).append("',\n")
                         .append("start: '").append(events.get(i).getDatetime_from().toString()).append("',\n")
                         .append("end: '").append(events.get(i).getDatetime_to().toString()).append("',\n")
@@ -61,7 +63,7 @@ public class EventToJsonService {
             } else {
                 allEventsToUser.add(object
                         .append("{\n")
-                        .append("title: '").append(events.get(i).getName()).append("',\n")
+                        .append("title: '").append(events.get(i).getEventName()).append("',\n")
                         .append("description: '").append(events.get(i).getMessage()).append("',\n")
                         .append("start: '").append(events.get(i).getDatetime_from().toString()).append("',\n")
                         .append("end: '").append(events.get(i).getDatetime_to().toString()).append("',\n")

@@ -15,7 +15,6 @@
     <div id="loginHalf">
         <div class="loginFormBox">
             <div class="logoImg">
-                <!--<img th:src="@{/img/EzraLogo.png}" alt="logo" height="70px">-->
                 <h1>Welcome</h1>
             </div>
             <div id="formBox">
@@ -56,7 +55,7 @@
 </main>
 <script th:inline="javascript">
     /*<![CDATA[*/
-    var username = /*[[${username}]]*/ 'a';
+    const username = /*[[${username}]]*/ 'a';
     if (username !== 'a'){
         document.getElementById("username").value = username
     }
