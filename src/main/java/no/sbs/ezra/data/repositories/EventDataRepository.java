@@ -1,5 +1,6 @@
 package no.sbs.ezra.data.repositories;
 
+import no.sbs.ezra.data.BoardData;
 import no.sbs.ezra.data.EventData;
 import no.sbs.ezra.security.UserPermission;
 import org.springframework.data.repository.CrudRepository;
@@ -10,4 +11,5 @@ public interface EventDataRepository extends CrudRepository<EventData, Integer> 
 
     List<EventData> findAllByBoardIdAndAndMembershipType(int boardDataId, UserPermission membershipType);
 
+    List<EventData> findAllByBoard(BoardData board);
 }

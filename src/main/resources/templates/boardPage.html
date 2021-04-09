@@ -13,9 +13,10 @@
 </head>
 <body>
 <header th:replace="fragments/headerFragment :: header"></header>
-<div th:if="${userPermission.getPermission().equals('master')}">
-    <div>
-        <a th:href="@{'/createEvent/' + ${board.id}}">New event</a>
+<div th:if="${userPermission.getPermission().equals('master') || userPermission.getPermission().equals('admin')}">
+    <div id="adminNavBar">
+        <a class="link" th:href="@{'/createEvent/' + ${board.id}}">New event</a>
+        <a class="link" th:href="@{'/boardMembers/' + ${board.id}}">Members</a>
     </div>
 </div>
 <main id="main-grid-container">
@@ -60,22 +61,109 @@
 
     <!--posts-->
     <section class="main">
-        <div id='calendar'></div>
+        <div id="ShowEventInfo"></div>
     </section>
 
     <!--events-->
     <section class="rightOfMain">
-        <table>
-            <caption>Upcoming events</caption>
-            <tr>
-                <td th:each="event : ${events}" th:object="${event}">
-                    <span th:text="*{eventName}"></span>
-                </td>
-            </tr>
-        </table>
+        <div>
+            <div>
+                <h2>Upcoming events</h2>
+            </div>
+            <div th:each="event : ${events}" th:object="${event}">
+                <div th:id="${eventStat.count}" onclick="showEvent(this.id)">
+                    <p th:text="*{eventName}"></p>
+                    <div class="toggle">
+                        <a class="link" th:href="@{'/createEvent/' + ${board.id} + '/' + ${event.id}}">Edit</a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
 
 </main>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const events = /*[[${events}]]*/ [{id: null}];
+    const showEventInfoNode = document.getElementById("ShowEventInfo")
+    console.log(showEventInfoNode.innerText === "")
 
+    function displayEvent(event){
+        let eventStart = new Date(Date.parse(event.datetime_from)).toLocaleDateString('en-GB', {
+            weekday: 'long',
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+        })
+        let eventEnd = new Date(Date.parse(event.datetime_to)).toLocaleDateString('en-GB', {
+            weekday: 'long',
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+        })
+
+        return `
+            <div id="eventSection">
+            <div id="eventBox">
+                <div class="logoImg">
+                    <h2>${event.eventName}</h2>
+                </div>
+                <div id="eventInfoBox">
+                    <div id="eventInfoElements">
+                        <div class="eventVariableInfoBox">
+                            <div class="variableField">
+                                <span class="infoField">Info/Description</span>
+                                <span class="eventInfoInput">${event.message}</span>
+                            </div>
+                        </div>
+                        <div class="eventVariableInfoBox">
+                            <div class="variableField">
+                                <span class="infoField">From</span>
+                                <span class="eventInfoInput">${eventStart}</span>
+                            </div>
+                        </div>
+                        <div class="eventVariableInfoBox">
+                            <div class="variableField">
+                                <span class="infoField">To</span>
+                                <span class="eventInfoInput">${eventEnd}</span>
+                            </div>
+                        </div>
+                        <div class="eventVariableInfoBox">
+                            <div class="variableField">
+                                <span class="infoField">Location</span>
+                                <span class="eventInfoInput">${event.location}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        `;
+    }
+    function populateMain(element){
+        if (element.innerText === ""){
+            if (events[0].id != null){
+                showEventInfoNode.innerHTML = displayEvent(events[0])
+            }
+        }
+    }
+    function showEvent(id){
+        showEventInfoNode.innerHTML = displayEvent(events[id - 1])
+        let divNode = document.getElementById(id);
+        let formNode = divNode.lastElementChild;
+
+        if (formNode.style.display === 'none') {
+            formNode.style.display = 'block';
+        } else {
+            formNode.style.display = 'none';
+        }
+    }
+    populateMain(showEventInfoNode);
+    /*]]>*/
+</script>
 </body>
 </html>

@@ -7,6 +7,7 @@
     <link th:href="@{/css/headerFragment.css}" rel="stylesheet"/>
     <link th:href="@{/css/loginPageStyle.css}" rel="stylesheet"/>
     <link th:href="@{/css/globalElements.css}" rel="stylesheet"/>
+    <link th:href="@{/js/notifications/dist/notifications.css}" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
           rel="stylesheet">
     <title>Ezra</title>
@@ -17,10 +18,11 @@
     <div id="loginHalf">
         <div class="loginFormBox">
             <div class="logoImg">
-                <h1>Sign up!</h1>
+                <h1>New Event!</h1>
             </div>
             <div id="formBox">
-                <form th:action="@{'/createEvent/'+${board.id}}" method="post" th:object="${eventData}">
+                <form th:if="${eventData.id == null}" th:action="@{'/createEvent/'+${board.id}}" method="post" th:object="${eventData}">
+                <form th:if="${eventData.id != null}" th:action="@{'/createEvent/'+${board.id}+'/'+${eventData.id}}" method="post" th:object="${eventData}">
                     <div id="loginBoxElements">
                         <div class="InputBox">
                             <div class="InputField">
@@ -35,7 +37,8 @@
                             <div class="InputField">
                                 <label class="label">
                                     <span class="span">Description</span>
-                                    <input type="text" class="input" th:field="*{message}" th:errorclass="filderror">
+                                    <!--<input type="text" class="input" th:field="*{message}" th:errorclass="filderror">-->
+                                    <textarea id="textArea" class="input" th:field="*{message}" th:errorclass="filderror" ></textarea>
                                 </label>
                             </div>
                         </div>
@@ -84,14 +87,50 @@
                             <span id="hasErrors"></span>
                         </div>
                         <div class="InputBox">
-                            <button type="submit">Create</button>
+                            <button type="submit">Save</button>
                         </div>
                     </div>
+                </form>
                 </form>
             </div>
         </div>
     </div>
     <div id="imgHalf"></div>
 </main>
+<script th:src="@{/js/notifications/dist/notifications.js}"></script>
+<script th:inline="javascript">
+    function calcHeight(value) {
+        let numberOfLineBrakes = (value.match(/\n/g) || []).length;
+        let newHeight = 20 + numberOfLineBrakes * 20 + 12 + 2;
+        return newHeight
+    }
+    let textarea = document.getElementById("textArea")
+    textarea.addEventListener("keyup", () => {
+        textarea.style.height = calcHeight(textarea.value) + "px";
+    })
+
+    /*<![CDATA[*/
+    const errors = /*[[${errors}]]*/ ['ph'];
+    let errorNode = document.getElementById("hasErrors")
+
+    if (errorNode != null) {
+        const myNotify = window.createNotification({
+            positionClass: 'nfc-top-right',
+            displayCloseButton: false,
+            onclick: true,
+            showDuration: 35000,
+            theme: 'error'
+        });
+        if (errors[0] !== undefined) {
+            for (let i = 0; i < errors.length; i++) {
+                myNotify({
+                    title: "Error",
+                    message: errors[i]
+                })
+            }
+        }
+    }
+    /*]]>*/
+</script>
 </body>
 </html>

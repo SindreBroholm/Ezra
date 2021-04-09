@@ -25,7 +25,6 @@ import javax.validation.Valid;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 
@@ -117,7 +116,7 @@ public class AccessController {
 
     @GetMapping("/boards")
     public String getBoardsPage(){
-        return "boardsPage";
+        return "searchForBoardPage";
     }
     @RequestMapping(value = "/searchForBoard", method = RequestMethod.POST)
     public String searchForBoards(Model model, @RequestParam() String keyword) {
@@ -132,7 +131,7 @@ public class AccessController {
         }
         model.addAttribute("searchResults", searchResults);
         model.addAttribute("keyword", keyword);
-        return "boardsPage";
+        return "searchForBoardPage";
     }
 
     @GetMapping("/newBoard")

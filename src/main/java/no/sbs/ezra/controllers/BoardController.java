@@ -10,8 +10,7 @@ import no.sbs.ezra.data.repositories.UserDataRepository;
 import no.sbs.ezra.data.repositories.UserRoleRepository;
 import no.sbs.ezra.data.validators.EventDataValidator;
 import no.sbs.ezra.security.PasswordConfig;
-import no.sbs.ezra.security.UserPermission;
-import org.apache.catalina.User;
+import no.sbs.ezra.servises.EventPermissionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -23,9 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Controller
 public class BoardController {
@@ -37,32 +34,31 @@ public class BoardController {
     private final BoardDataRepository boardDataRepository;
     private final UserRoleRepository userRoleRepository;
     private final EventDataRepository eventDataRepository;
+    private final EventPermissionService eventPermissionService;
 
 
-    public BoardController(PasswordConfig passwordEncoder, UserDataRepository userDataRepository, BoardDataRepository boardDataRepository, UserRoleRepository userRoleRepository, EventDataRepository eventDataRepository) {
+    public BoardController(PasswordConfig passwordEncoder, UserDataRepository userDataRepository, BoardDataRepository boardDataRepository, UserRoleRepository userRoleRepository, EventDataRepository eventDataRepository, EventPermissionService eventPermissionService) {
         this.passwordEncoder = passwordEncoder;
         this.userDataRepository = userDataRepository;
         this.boardDataRepository = boardDataRepository;
         this.userRoleRepository = userRoleRepository;
         this.eventDataRepository = eventDataRepository;
+        this.eventPermissionService = eventPermissionService;
     }
 
     @GetMapping("/board/{id}")
-    public String getBoardPage(Model model, @PathVariable Integer id, Principal principal){
-        if (id > 0){
-            UserData user = userDataRepository.findByEmail(principal.getName());
-            if (id.toString().matches("^[0-9]*$")){
-                BoardData board;
-                try{
-                    board = boardDataRepository.findById(id).get();
-                } catch (Exception e){
-                    logger.error("Cant find boardData, id does not exist");
-                    return "redirect:/";
+    public String getBoardPage(Model model, @PathVariable Integer id, Principal principal) {
+        if (id > 0) {
+            if (id.toString().matches("^[0-9]*$")) {
+                if (boardDataRepository.findById(id).isPresent()) {
+                    UserData user = userDataRepository.findByEmail(principal.getName());
+                    model.addAttribute("userPermission", userRoleRepository.findByBoardIdAndUserId(id, user.getId()).getMembershipType());
+                    model.addAttribute("events", eventPermissionService.getAllEventsFromBoardByUserPermission(boardDataRepository.findById(id).get(), userRoleRepository.findByBoardIdAndUserId(id, user.getId()).getMembershipType()));
+                    model.addAttribute("board", boardDataRepository.findById(id).get());
+                    return "boardPage";
+                } else {
+                    logger.error("Cant find boardData with id: " + id + ", id does not exist");
                 }
-                model.addAttribute("userPermission", userRoleRepository.findByBoardIdAndUserId(id, user.getId()).getMembershipType());
-                model.addAttribute("events", eventDataRepository.findAllByBoardIdAndAndMembershipType(id, userRoleRepository.findByBoardIdAndUserId(id, user.getId()).getMembershipType()));
-                model.addAttribute("board", board);
-                return "boardPage";
             }
         }
         return "redirect:/";
@@ -70,68 +66,64 @@ public class BoardController {
 
     @GetMapping(value = {"/createEvent/{boardId}", "/createEvent/{boardId}/{eventId}"})
     public String getCreateOrEditEventPage(Model model, @PathVariable Integer boardId,
-                                           @RequestParam( name = "eventId", required = false) Integer eventId, Principal principal){
-
-        UserData user = userDataRepository.findByEmail(principal.getName());
+                                           @PathVariable(required = false) Integer eventId, Principal principal) {
         BoardData board = getBoardData(boardId);
-        if (board != null){
+        if (board != null) {
+            UserData user = userDataRepository.findByEmail(principal.getName());
             UserRole role = userRoleRepository.findByBoardIdAndUserId(board.getId(), user.getId());
-            if (role.getMembershipType().getPermission().equals("master")){
-                EventData event;
-                if (eventId != null){
-                    if (eventDataRepository.findById(eventId).isPresent()){
-                        event = eventDataRepository.findById(eventId).get();
-                    } else {
-                        event = new EventData();
-                    }
-                } else {
-                    event = new EventData();
-                }
+            if (role.getMembershipType().getPermission().equals("master")) {
                 model.addAttribute("board", board);
-                model.addAttribute("eventData", event);
+                model.addAttribute("eventData", getNewOrExistingEvent(eventId));
                 return "createOrEditEventPage";
-            }else {
+            } else {
                 logger.error("User with id: " + user.getId() + " attempted access to /createEvent/" + boardId + ", but dont have permission");
                 return "redirect:/board/" + boardId;
             }
         } else {
-            logger.error("BordId: "+ boardId + ", does not exist");
+            logger.error("BordId: " + boardId + ", does not exist");
             return "redirect:/";
         }
     }
 
-    private EventData getEventDataOrFillWithEmptyEventData(Integer eventId) {
+    private EventData getNewOrExistingEvent(Integer eventId) {
         EventData event;
-        if (eventDataRepository.findById(eventId).isPresent()){
-            event = eventDataRepository.findById(eventId).get();
+        if (eventId != null) {
+            if (eventDataRepository.findById(eventId).isPresent()) {
+                event = eventDataRepository.findById(eventId).get();
+                return event;
+            } else {
+                event = new EventData();
+            }
         } else {
             event = new EventData();
         }
         return event;
     }
 
-    @RequestMapping(value = "/createEvent/{boardId}", method = RequestMethod.POST)
+
+    @RequestMapping(value = {"/createEvent/{boardId}", "/createEvent/{boardId}/{eventId}" }, method = RequestMethod.POST)
     public String createOrEditEvent(@Valid @ModelAttribute("eventData") EventData eventData, BindingResult br,
-                                    @PathVariable Integer boardId, Principal principal, Model model){
+                                    @PathVariable Integer boardId, @PathVariable(required = false) Integer eventId,
+                                    Principal principal, Model model) {
         UserData user = userDataRepository.findByEmail(principal.getName());
         BoardData board = getBoardData(boardId);
         if (board == null) return "redirect:/";
         eventData.setBoard(board);
         UserRole role = userRoleRepository.findByBoardIdAndUserId(board.getId(), user.getId());
-        if (role.getMembershipType().getPermission().equals("master")){
-            EventDataValidator validator = new EventDataValidator(eventDataRepository);
+        if (role.getMembershipType().getPermission().equals("master")) {
+            EventDataValidator validator = new EventDataValidator();
             if (validator.supports(eventData.getClass())) {
+                logger.info(eventData.toString());
                 validator.validate(eventData, br);
             } else {
                 logger.error("Failed to support EventData class and or validate EventData");
             }
             if (br.hasErrors()) {
-                System.out.println(eventData);
                 model.addAttribute("errors", getAllValidationErrorsForEventData(br));
+                model.addAttribute("board", board);
                 return "createOrEditEventPage";
             } else {
-                System.out.println(eventData);
-                saveOrUpdateEvent(eventData);
+                saveOrUpdateEvent(eventData, eventId);
                 return "redirect:/";
             }
         } else {
@@ -139,21 +131,20 @@ public class BoardController {
         }
     }
 
-    private BoardData getBoardData(Integer boardId){
+    private BoardData getBoardData(Integer boardId) {
         BoardData board;
-        try{
+        if (boardDataRepository.findById(boardId).isPresent()) {
             board = boardDataRepository.findById(boardId).orElseThrow();
-        } catch (NoSuchElementException e){
-            logger.error("Failed to get BoardData\n"+e.getLocalizedMessage());
+        } else {
+            logger.error("Failed to get BoardData\n");
             return null;
         }
         return board;
     }
 
-    private void saveOrUpdateEvent(EventData event) {
-        if (eventDataRepository.findById(event.getId()).isPresent()){
-            EventData existingEvent = eventDataRepository.findById(event.getId()).get();
-            eventDataRepository.save(existingEvent);
+    private void saveOrUpdateEvent(EventData event, Integer eventId) {
+        if (eventDataRepository.findById(eventId).isPresent()) {
+            eventDataRepository.save(eventDataRepository.findById(eventId).get());
             logger.info("Event updated: " + event.toString());
         } else {
             eventDataRepository.save(event);
@@ -169,7 +160,7 @@ public class BoardController {
                 allErrors) {
             errors.add(e.getDefaultMessage());
         }
-        logger.error("EventData validation errors: "+errors.toString());
+        logger.error("EventData validation errors: " + errors.toString());
         return errors;
     }
 }

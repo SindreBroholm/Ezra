@@ -24,42 +24,35 @@ public class EventData {
     @ManyToOne
     private BoardData board;
 
-    @Size(max = 5000)
+
     @NotNull
     private String message;
 
-    @NotNull
-    @FutureOrPresent
+    @NotNull(message = "Please select when the event starts")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime datetime_from;
 
-    @NotNull
-    @FutureOrPresent
+    @NotNull(message = "Please select when the event ends")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime datetime_to;
 
     @NotNull
     private LocalDateTime datetime_created = LocalDateTime.now();
 
-    @NotNull
+    @NotNull(message = "Please select who this event is for")
     @Enumerated(EnumType.STRING)
     private UserPermission membershipType;
 
+
     private String location;
 
-    @NotEmpty
-    @Size(max = 150)
     @NotNull
     private String eventName;
 
-    public EventData(@NotNull BoardData board,
-                     @Size(max = 5000) @NotNull String message,
-                     @NotNull @FutureOrPresent LocalDateTime datetime_from,
-                     @NotNull @FutureOrPresent LocalDateTime datetime_to,
-                     @NotNull LocalDateTime datetime_created,
-                     @NotNull UserPermission membershipType,
-                     String location,
-                     @NotEmpty @Size(max = 150) @NotNull String eventName) {
+    public EventData(BoardData board, @NotNull String message,
+                     @NotNull LocalDateTime datetime_from, @NotNull LocalDateTime datetime_to,
+                     @NotNull LocalDateTime datetime_created, @NotNull UserPermission membershipType,
+                     String location, @NotNull String eventName) {
         this.board = board;
         this.message = message;
         this.datetime_from = datetime_from;

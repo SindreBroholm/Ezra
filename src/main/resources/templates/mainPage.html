@@ -18,7 +18,7 @@
     <section class="leftOfMain">
         <p>My boards</p>
         <div th:each="board: ${myBoards}">
-            <a href=""><span th:text="${board.name}"></span></a>
+            <a th:href="@{'/board/' + ${board.id}}"><span th:text="${board.name}"></span></a>
         </div>
     </section>
     <main class="main">

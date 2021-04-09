@@ -45,9 +45,37 @@ div{
     margin: 0;
     position: relative;
 }
-a{
+
+.link{
+    -webkit-writing-mode: horizontal-tb !important;
+    text-rendering: auto;
+    color: #FEFEDF;
+    letter-spacing: normal;
+    word-spacing: normal;
+    text-transform: none;
+    text-indent: 0;
+    text-shadow: #4C4452;
+    display: inline-block;
+    text-align: center;
+    align-items: flex-start;
+    cursor: default;
+    background-color: #1D9F91;
+    box-sizing: border-box;
+    font: 400 1.5em 'Open Sans';
+    padding: 2px 24px;;
+    border-width: 3px;
+    border-style: unset;
+    border-radius: 5px;
+    border-color: #1D9F91;
+    border-image: initial;
+    transition: width 0.5s, height 0.5s, transform 0.5s;
+    margin: 0;
     text-decoration: none;
-    color: black;
+}
+.link:hover{
+    transform: scale(1.1, 1.1);
+    color: ThreeDLightShadow;
+    box-shadow: 0 5px 10px 5px #4C4452;
 }
 form{
     display: flex;
