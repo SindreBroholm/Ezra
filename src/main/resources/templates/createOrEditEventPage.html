@@ -22,6 +22,74 @@
             </div>
             <div id="formBox">
                 <form th:if="${eventData.id == null}" th:action="@{'/createEvent/'+${board.id}}" method="post" th:object="${eventData}">
+                    <div id="loginBoxElements">
+                        <div class="InputBox">
+                            <div class="InputField">
+                                <label class="label">
+                                    <span class="span">Event name</span>
+                                    <input type="text" class="input" th:field="*{eventName}" th:errorclass="filderror" autofocus="autofocus">
+                                    <input type="text" class="input" th:field="*{board}" th:errorclass="filderror" th:value="${board}" hidden>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="InputBox">
+                            <div class="InputField">
+                                <label class="label">
+                                    <span class="span">Description</span>
+                                    <!--<input type="text" class="input" th:field="*{message}" th:errorclass="filderror">-->
+                                    <textarea id="textArea" class="input" th:field="*{message}" th:errorclass="filderror" ></textarea>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="InputBox">
+                            <div class="InputField">
+                                <label class="label">
+                                    <span class="span">Location</span>
+                                    <input type="text" class="input" th:field="*{location}" th:errorclass="filderror">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="InputBox">
+                            <div class="InputField">
+                                <label class="label">
+                                    <span class="span">Start</span>
+                                    <input type="datetime-local" class="input" th:field="*{datetime_from}" th:errorclass="filderror">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="InputBox">
+                            <div class="InputField">
+                                <label class="label">
+                                    <span class="span">End</span>
+                                    <input type="datetime-local" class="input" th:field="*{datetime_to}" th:errorclass="filderror">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="InputBox">
+                            <div class="radioButtonsBox">
+                                <span>Who can see this event?</span>
+                                <label>Admin
+                                    <input type="radio" th:field="*{membershipType}" th:errorclass="filderror" th:value="${T(no.sbs.ezra.security.UserPermission).ADMIN}">
+                                </label>
+                                <label>Members
+                                    <input type="radio" th:field="*{membershipType}" th:errorclass="filderror" th:value="${T(no.sbs.ezra.security.UserPermission).MEMBER}">
+                                </label>
+                                <label>Followers
+                                    <input type="radio" th:field="*{membershipType}" th:errorclass="filderror" th:value="${T(no.sbs.ezra.security.UserPermission).FOLLOWER}">
+                                </label>
+                                <label>Everyone
+                                    <input type="radio" th:field="*{membershipType}" th:errorclass="filderror" th:value="${T(no.sbs.ezra.security.UserPermission).VISITOR}">
+                                </label>
+                            </div>
+                        </div>
+                        <div th:if="${#fields.hasErrors()}">
+                            <span id="hasErrors"></span>
+                        </div>
+                        <div class="InputBox">
+                            <button type="submit">Save</button>
+                        </div>
+                    </div>
+                </form>
                 <form th:if="${eventData.id != null}" th:action="@{'/createEvent/'+${board.id}+'/'+${eventData.id}}" method="post" th:object="${eventData}">
                     <div id="loginBoxElements">
                         <div class="InputBox">
@@ -90,7 +158,6 @@
                             <button type="submit">Save</button>
                         </div>
                     </div>
-                </form>
                 </form>
             </div>
         </div>
