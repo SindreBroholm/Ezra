@@ -93,6 +93,12 @@
     margin: 0;
     min-width: 0;
 }
+#textLabel1{
+    height: 73px;
+}
+#textLabel2{
+    height: 73px;
+}
 .span{
     transform: scale(.83333)
                 translateY(-10px);
