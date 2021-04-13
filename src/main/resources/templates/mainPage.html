@@ -29,10 +29,18 @@
 <script th:inline="javascript">
     /*<![CDATA[*/
     document.addEventListener('DOMContentLoaded', function () {
-        const calendarEl = document.getElementById('calendar');
+
+        /*This is an array of all events connected to user*/
         const eventArray = /*[[${allEvents}]]*/ [];
+
+        const calendarEl = document.getElementById('calendar');
         const rightSection = document.getElementById("rightOfMain")
 
+        /*
+        * This functions returns HTML for event and date clicked,
+        * also includes dateTime handlers.
+        * They will populate the right side of the grid-layout for this page
+        */
         function showEvent(event) {
             let eventStart = new Date(Date.parse(event.start)).toLocaleDateString(undefined, {
                 weekday: 'long',
@@ -93,12 +101,21 @@
             </div>
         </div>`
         }
-
         function showEvents(event) {
             let getDateStat = event.start
             let sliceStartDate = getDateStat.slice(11)
             let getDateEnd = event.end
-            let sliceEndDate = getDateEnd.slice(11)
+            let sliceEndDate;
+            if (getDateStat.slice(0, 10) === getDateEnd.slice(0, 10)){
+                sliceEndDate = getDateEnd.slice(11)
+            } else {
+                sliceEndDate = new Date(Date.parse(event.end)).toLocaleDateString(undefined, {
+                    day: 'numeric',
+                    month: 'long',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                })
+            }
             return `
                 <div class="div" id="eventInfoBox">
                     <div  class="div" id="eventInfoElements">
@@ -112,7 +129,7 @@
                             <div class="variableField div">
                             <div class="timeInfoBox">
                                 <span class="eventInfoInput">${sliceStartDate}</span>
-                                <span class="infoField">To</span>
+                                <span class="infoField">-</span>
                                 <span class="eventInfoInput">${sliceEndDate}</span>
                             </div>
 
@@ -127,12 +144,9 @@
         const calendar = new FullCalendar.Calendar(calendarEl, {
             eventClick: function (info) {
                 let eventObj = info.event;
-                console.log(eventObj)
                 rightSection.innerHTML = showEvent(eventObj);
-
             },
             dateClick: function (info) {
-                console.log(info.dateStr)
                 let today = new Date(Date.parse(info.dateStr)).toLocaleDateString(undefined, {
                     weekday: 'long',
                     day: 'numeric',
@@ -150,9 +164,8 @@
                     }
                 })
                 rightSection.innerHTML = tempHTML;
-                console.log(eventsThisDay)
             },
-            headerToolbar: {center: 'dayGridMonth,timeGridWeek'},
+            headerToolbar: {center: 'dayGridMonth,dayGridWeek,dayGridDay'},
             initialView: 'dayGridMonth',
             nextDayThreshold: '00:00:00',
             eventTimeFormat: { // like '14:30'
@@ -164,7 +177,6 @@
         });
         calendar.render();
     });
-
 
 </script>
 </body>

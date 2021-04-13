@@ -28,13 +28,8 @@ public class EventToJsonService {
 
 
     /*
-    * Required format =
-    * {
-    *   title: 'my event',
-    *   start: 'YYYY-MM-DDTHH:MM:SS',
-    *   end: 'YYYY-MM-DDTHH:MM:SS',
-    *   display: 'list-item'
-    * }
+    * document: https://fullcalendar.io/docs/event-object
+    * note extendedProps -> "Receives properties in the explicitly given extendedProps hash as well as other non-standard properties."
     *  */
 
     public JSONArray getAllEventsToUser(int userDataId){

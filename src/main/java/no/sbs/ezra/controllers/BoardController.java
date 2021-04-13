@@ -138,8 +138,8 @@ public class BoardController {
         UserRole role = userRoleRepository.findByBoardIdAndUserId(board.getId(), user.getId());
         if (role.getMembershipType().getPermission().equals("master") || role.getMembershipType().getPermission().equals("admin")) {
             if (eventDataRepository.findById(eventId).isPresent()){
-                eventDataRepository.delete(eventDataRepository.findById(eventId).get());
                 logger.info("Event: " + eventDataRepository.findById(eventId).get() + ", was deleted by user with id: " + user.getId());
+                eventDataRepository.delete(eventDataRepository.findById(eventId).get());
             }
         }
         return "redirect:/board/" + boardId;
@@ -158,7 +158,15 @@ public class BoardController {
 
     private void saveOrUpdateEvent(EventData event, Integer eventId) {
         if (eventDataRepository.findById(eventId).isPresent()) {
-            eventDataRepository.save(eventDataRepository.findById(eventId).get());
+            EventData update = eventDataRepository.findById(eventId).get();
+            update.setBoard(event.getBoard());
+            update.setMessage(event.getMessage());
+            update.setMembershipType(event.getMembershipType());
+            update.setLocation(event.getLocation());
+            update.setEventName(event.getEventName());
+            update.setDatetime_to(event.getDatetime_to());
+            update.setDatetime_from(event.getDatetime_from());
+            eventDataRepository.save(update);
             logger.info("Event updated: " + event.toString());
         } else {
             eventDataRepository.save(event);

@@ -1,11 +1,9 @@
 package no.sbs.ezra.controllers;
 
 import no.sbs.ezra.data.BoardData;
-import no.sbs.ezra.data.EventData;
 import no.sbs.ezra.data.UserData;
 import no.sbs.ezra.data.UserRole;
 import no.sbs.ezra.data.repositories.BoardDataRepository;
-import no.sbs.ezra.data.repositories.EventDataRepository;
 import no.sbs.ezra.data.repositories.UserRoleRepository;
 import no.sbs.ezra.data.validators.BoardDataValidator;
 import no.sbs.ezra.data.validators.UserDataValidator;
@@ -39,33 +37,29 @@ public class AccessController {
     private final UserDataRepository userDataRepository;
     private final BoardDataRepository boardDataRepository;
     private final UserRoleRepository userRoleRepository;
-    private final EventDataRepository eventDataRepository;
+    private final EventToJsonService eventToJsonService;
     private final EventPermissionService eventPermissionService;
 
 
-    public AccessController(PasswordConfig passwordEncoder, UserDataRepository userDataRepository, BoardDataRepository boardDataRepository, UserRoleRepository userRoleRepository, EventDataRepository eventDataRepository, EventPermissionService eventPermissionService) {
+    public AccessController(PasswordConfig passwordEncoder, UserDataRepository userDataRepository, BoardDataRepository boardDataRepository, UserRoleRepository userRoleRepository, EventToJsonService eventToJsonService, EventPermissionService eventPermissionService) {
         this.passwordEncoder = passwordEncoder;
         this.userDataRepository = userDataRepository;
         this.boardDataRepository = boardDataRepository;
         this.userRoleRepository = userRoleRepository;
-        this.eventDataRepository = eventDataRepository;
+        this.eventToJsonService = eventToJsonService;
         this.eventPermissionService = eventPermissionService;
     }
 
     @GetMapping("/")
     public String homePage(Model model, Principal principal){
         UserData user = userDataRepository.findByEmail(principal.getName());
-
         List<UserRole> listOfUserRoles = userRoleRepository.findAllByUserId(user.getId());
         List<BoardData> boards = new ArrayList<>();
-
         for (UserRole ur :
                 listOfUserRoles) {
             Optional<BoardData> temp = boardDataRepository.findById(ur.getBoardId());
             boards.add(temp.orElseThrow());
         }
-
-        EventToJsonService eventToJsonService = new EventToJsonService(userRoleRepository, eventPermissionService, boardDataRepository);
 
         model.addAttribute("allEvents", eventToJsonService.getAllEventsToUser(user.getId()));
         model.addAttribute("myBoards", boards);
