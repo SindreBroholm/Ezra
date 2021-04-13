@@ -9,7 +9,6 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
           rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.5.1/main.css" rel="stylesheet"/>
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.5.1/main.min.js"></script>
     <title>Ezra</title>
 </head>
 <body>
@@ -24,16 +23,136 @@
     <main class="main">
         <div id='calendar'></div>
     </main>
-    <section class="rightOfMain">
-        <p>Events today</p>
-    </section>
+    <section id="rightOfMain" class="div"></section>
 </article>
-<script>
-
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.5.1/main.min.js"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
     document.addEventListener('DOMContentLoaded', function () {
         const calendarEl = document.getElementById('calendar');
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-            headerToolbar: { center: 'dayGridMonth,timeGridWeek' },
+        const eventArray = /*[[${allEvents}]]*/ [];
+        const rightSection = document.getElementById("rightOfMain")
+
+        function showEvent(event) {
+            let eventStart = new Date(Date.parse(event.start)).toLocaleDateString(undefined, {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+            })
+            let eventEnd = new Date(Date.parse(event.end)).toLocaleDateString(undefined, {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+            })
+            return `
+            <div class="div" id="eventSection">
+            <div class="div" id="eventBox">
+                <div class="div logoImg">
+                    <h2>${event.extendedProps.boardName}</h2>
+                </div>
+                <div class="div" id="eventInfoBox">
+                    <div  class="div" id="eventInfoElements">
+                        <div class="eventVariableInfoBox div">
+                            <div class="variableField div">
+                                <span class="infoField">Event</span>
+                                <span class="eventInfoInput">${event.title}</span>
+                            </div>
+                        </div>
+                        <div class="eventVariableInfoBox div">
+                            <div class="variableField div">
+                                <span class="infoField">From</span>
+                                <span class="eventInfoInput">${eventStart}</span>
+                            </div>
+                        </div>
+                        <div class="eventVariableInfoBox div">
+                            <div class="variableField div">
+                                <span class="infoField">To</span>
+                                <span class="eventInfoInput">${eventEnd}</span>
+                            </div>
+                        </div>
+                        <div class="eventVariableInfoBox div">
+                            <div class="variableField div">
+                                <span class="infoField">Location</span>
+                                <span class="eventInfoInput">${event.extendedProps.location}</span>
+                            </div>
+                        </div>
+                        <div class="eventVariableInfoBox div">
+                            <div class="variableField div">
+                                <span class="infoField">Info</span>
+                                <span class="eventInfoInput">${event.extendedProps.description}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>`
+        }
+
+        function showEvents(event) {
+            let getDateStat = event.start
+            let sliceStartDate = getDateStat.slice(11)
+            let getDateEnd = event.end
+            let sliceEndDate = getDateEnd.slice(11)
+            return `
+                <div class="div" id="eventInfoBox">
+                    <div  class="div" id="eventInfoElements">
+                        <div class="eventVariableInfoBox div">
+                            <div class="variableField div">
+                                <span class="infoField">${event.boardName}</span>
+                                <span class="eventInfoInput">${event.title}</span>
+                            </div>
+                        </div>
+                        <div class="eventVariableInfoBox div">
+                            <div class="variableField div">
+                            <div class="timeInfoBox">
+                                <span class="eventInfoInput">${sliceStartDate}</span>
+                                <span class="infoField">To</span>
+                                <span class="eventInfoInput">${sliceEndDate}</span>
+                            </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `
+        }
+
+
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            eventClick: function (info) {
+                let eventObj = info.event;
+                console.log(eventObj)
+                rightSection.innerHTML = showEvent(eventObj);
+
+            },
+            dateClick: function (info) {
+                console.log(info.dateStr)
+                let today = new Date(Date.parse(info.dateStr)).toLocaleDateString(undefined, {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                })
+                let eventsThisDay = [];
+                let tempHTML = today.toString();
+                eventArray.forEach(value => {
+                    let getDate = value.start
+                    let sliceDate = getDate.slice(0, 10)
+                    if (sliceDate === info.dateStr){
+                        eventsThisDay.push(value);
+                        tempHTML += showEvents(value);
+                    }
+                })
+                rightSection.innerHTML = tempHTML;
+                console.log(eventsThisDay)
+            },
+            headerToolbar: {center: 'dayGridMonth,timeGridWeek'},
             initialView: 'dayGridMonth',
             nextDayThreshold: '00:00:00',
             eventTimeFormat: { // like '14:30'
@@ -41,20 +160,11 @@
                 minute: '2-digit',
                 hour12: false
             },
-            events: [
-                {
-                    start: '2021-03-27T14:30:00',
-                    display: 'list-item'
-                }
-            ],
-
-        });
-
-        calendar.on('dateClick', function(info) {
-            console.log('clicked on ' + info.dateStr);
+            events: eventArray
         });
         calendar.render();
     });
+
 
 </script>
 </body>

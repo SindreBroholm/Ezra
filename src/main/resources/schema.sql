@@ -74,3 +74,6 @@ create table ezra.notification
     foreign key (Board_Id) references board_data (Id) ON DELETE CASCADE,
     foreign key (Membership_Type) references membership (Type) ON DELETE CASCADE
 );
+
+
+select * from ezra.user_role ur where User_Id = 3;

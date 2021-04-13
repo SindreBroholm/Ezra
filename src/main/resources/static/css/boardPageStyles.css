@@ -127,7 +127,25 @@
     margin-left: 5px;
     margin-top: 5px;
 }
-
+.alterEventBox{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    flex-flow: initial;
+    justify-content: flex-end;
+}
+.xex{
+    flex-wrap: wrap;
+    flex-direction: column;
+    flex-flow: initial;
+    justify-content: end;
+}
+.mrmrmr{
+    margin-right: 40px;
+}
+.mlmlml{
+    margin-left: 20px;
+}
 
 .rightOfMain {
     grid-area: right;
@@ -135,4 +153,5 @@
 }
 .toggle{
     display: none;
+    margin-top: 6px;
 }

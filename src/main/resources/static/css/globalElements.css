@@ -77,6 +77,10 @@ div{
     color: ThreeDLightShadow;
     box-shadow: 0 5px 10px 5px #4C4452;
 }
+.delete{
+    background-color: red;
+    border-color: red;
+}
 form{
     display: flex;
     -webkit-box-orient: vertical;

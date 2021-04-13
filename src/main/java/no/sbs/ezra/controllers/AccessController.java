@@ -12,6 +12,8 @@ import no.sbs.ezra.data.validators.UserDataValidator;
 import no.sbs.ezra.data.repositories.UserDataRepository;
 import no.sbs.ezra.security.PasswordConfig;
 import no.sbs.ezra.security.UserPermission;
+import no.sbs.ezra.servises.EventPermissionService;
+import no.sbs.ezra.servises.EventToJsonService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -38,14 +40,16 @@ public class AccessController {
     private final BoardDataRepository boardDataRepository;
     private final UserRoleRepository userRoleRepository;
     private final EventDataRepository eventDataRepository;
+    private final EventPermissionService eventPermissionService;
 
 
-    public AccessController(PasswordConfig passwordEncoder, UserDataRepository userDataRepository, BoardDataRepository boardDataRepository, UserRoleRepository userRoleRepository, EventDataRepository eventDataRepository) {
+    public AccessController(PasswordConfig passwordEncoder, UserDataRepository userDataRepository, BoardDataRepository boardDataRepository, UserRoleRepository userRoleRepository, EventDataRepository eventDataRepository, EventPermissionService eventPermissionService) {
         this.passwordEncoder = passwordEncoder;
         this.userDataRepository = userDataRepository;
         this.boardDataRepository = boardDataRepository;
         this.userRoleRepository = userRoleRepository;
         this.eventDataRepository = eventDataRepository;
+        this.eventPermissionService = eventPermissionService;
     }
 
     @GetMapping("/")
@@ -54,26 +58,20 @@ public class AccessController {
 
         List<UserRole> listOfUserRoles = userRoleRepository.findAllByUserId(user.getId());
         List<BoardData> boards = new ArrayList<>();
-        List<EventData> allEvents = new ArrayList<>();
 
-        //todo: extract to method and logg posible events.
-        //also: add the handler on mainPage for events!
         for (UserRole ur :
                 listOfUserRoles) {
             Optional<BoardData> temp = boardDataRepository.findById(ur.getBoardId());
             boards.add(temp.orElseThrow());
-            System.out.println(ur.getMembershipType().getPermission());
-            allEvents.addAll(getAllUserEvents(ur.getBoardId(), ur.getMembershipType().getPermission()));
         }
 
-        model.addAttribute("allEvents", allEvents);
+        EventToJsonService eventToJsonService = new EventToJsonService(userRoleRepository, eventPermissionService, boardDataRepository);
+
+        model.addAttribute("allEvents", eventToJsonService.getAllEventsToUser(user.getId()));
         model.addAttribute("myBoards", boards);
         return "mainPage";
     }
 
-    private List<EventData> getAllUserEvents(int boardId, String permission) {
-        return eventDataRepository.findAllByBoardIdAndAndMembershipType(boardId, UserPermission.valueOf(permission.toUpperCase()));
-    }
 
     @GetMapping("/login")
     public String getLoginPage(){

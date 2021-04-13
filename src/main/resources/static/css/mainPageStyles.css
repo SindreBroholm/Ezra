@@ -17,7 +17,80 @@
     grid-area: left;
     width: 100%;
 }
-.rightOfMain{
+#rightOfMain{
     grid-area: right;
     width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+#eventSection {
+    -webkit-box-flex: 1;
+    flex-grow: 1;
+    -webkit-box-pack: center;
+    justify-content: center;
+    width: 100%;
+    padding: 0 30px;
+
+}
+
+#eventBox {
+    -webkit-box-align: center;
+    align-items: center;
+    border: 1px solid black;
+    border-radius: 1px;
+    padding: 10px 20px;
+}
+
+#eventInfoBox {
+    max-width: 100%;
+    min-width: 300px;
+    padding: 12px 0;
+    border: 1px solid black;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin: 10px 0;
+}
+
+
+#eventInfoElements {
+    margin-top: 0;
+    -webkit-box-flex: 0;
+    flex: 0 0 auto;
+    -webkit-box-pack: start;
+    justify-content: flex-start;
+    -webkit-box-align: stretch;
+    align-items: stretch;
+    align-content: stretch;
+    padding: 5px 0;
+}
+.eventVariableInfoBox{
+    margin: 5px 0;
+}
+
+.variableField {
+    font-size: 14px;
+    color: gray;
+}
+
+.eventInfoInput {
+    font-size: 18px;
+    font-weight: normal;
+    color: black;
+    margin-left: 5px;
+    margin-top: 5px;
+}
+.div{
+    -webkit-box-align: stretch;
+    -webkit-align-items: stretch;
+    align-items: stretch;
+    border: 0 solid #000;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    flex-direction: column;
+    padding: 0;
+    position: relative;
 }

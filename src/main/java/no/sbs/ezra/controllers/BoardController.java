@@ -113,7 +113,6 @@ public class BoardController {
         if (role.getMembershipType().getPermission().equals("master")) {
             EventDataValidator validator = new EventDataValidator();
             if (validator.supports(eventData.getClass())) {
-                logger.info(eventData.toString());
                 validator.validate(eventData, br);
             } else {
                 logger.error("Failed to support EventData class and or validate EventData");
@@ -129,6 +128,21 @@ public class BoardController {
         } else {
             return "redirect:/";
         }
+    }
+
+    @RequestMapping(value = "/deleteEvent/{boardId}/{eventId}", method = RequestMethod.POST)
+    public String deleteEvent(@PathVariable Integer boardId, @PathVariable Integer eventId, Principal principal){
+        UserData user = userDataRepository.findByEmail(principal.getName());
+        BoardData board = getBoardData(boardId);
+        if (board == null) return "redirect:/";
+        UserRole role = userRoleRepository.findByBoardIdAndUserId(board.getId(), user.getId());
+        if (role.getMembershipType().getPermission().equals("master") || role.getMembershipType().getPermission().equals("admin")) {
+            if (eventDataRepository.findById(eventId).isPresent()){
+                eventDataRepository.delete(eventDataRepository.findById(eventId).get());
+                logger.info("Event: " + eventDataRepository.findById(eventId).get() + ", was deleted by user with id: " + user.getId());
+            }
+        }
+        return "redirect:/board/" + boardId;
     }
 
     private BoardData getBoardData(Integer boardId) {

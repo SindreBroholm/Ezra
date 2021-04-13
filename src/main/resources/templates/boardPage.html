@@ -71,10 +71,22 @@
                 <h2>Upcoming events</h2>
             </div>
             <div th:each="event : ${events}" th:object="${event}">
-                <div th:id="${eventStat.count}" onclick="showEvent(this.id)">
-                    <p th:text="*{eventName}"></p>
-                    <div class="toggle">
-                        <a class="link" th:href="@{'/createEvent/' + ${board.id} + '/' + ${event.id}}">Edit</a>
+                <div>
+                    <div class="eventVariableInfoBox">
+                        <div class="variableField xex" th:id="${eventStat.count}" onclick="showEvent(this.id)">
+                            <div class="mrmrmr">
+                                <span class="infoField">event</span>
+                                <span class="eventInfoInput" th:text="*{eventName}"></span>
+                            </div>
+                            <div class="toggle">
+                                <div class="alterEventBox">
+                                    <a class="link" th:href="@{'/createEvent/' + ${board.id} + '/' + ${event.id}}">Edit</a>
+                                    <form class="mlmlml" th:action="@{'/deleteEvent/' + *{board.id} + '/' + *{id}}" method="post">
+                                        <button class="delete link">Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -87,6 +99,7 @@
     const events = /*[[${events}]]*/ [{id: null}];
     const showEventInfoNode = document.getElementById("ShowEventInfo")
     console.log(showEventInfoNode.innerText === "")
+    console.log(showEventInfoNode)
 
     function displayEvent(event){
         let eventStart = new Date(Date.parse(event.datetime_from)).toLocaleDateString('en-GB', {
@@ -145,9 +158,22 @@
         `;
     }
     function populateMain(element){
+        console.log(events)
         if (element.innerText === ""){
-            if (events[0].id != null){
-                showEventInfoNode.innerHTML = displayEvent(events[0])
+            if (events.length !== 0){
+                if (events[0].id != null){
+                    showEventInfoNode.innerHTML = displayEvent(events[0])
+                }
+            }else {
+                showEventInfoNode.innerHTML = `
+            <div id="eventSection">
+            <div id="eventBox">
+                <div class="logoImg">
+                    <h2>There are no upcoming events</h2>
+                </div>
+            </div>
+            </div>
+`
             }
         }
     }

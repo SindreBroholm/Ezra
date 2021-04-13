@@ -2,25 +2,28 @@ package no.sbs.ezra.servises;
 
 import no.sbs.ezra.data.EventData;
 import no.sbs.ezra.data.UserRole;
-import no.sbs.ezra.data.repositories.EventDataRepository;
+import no.sbs.ezra.data.repositories.BoardDataRepository;
 import no.sbs.ezra.data.repositories.UserRoleRepository;
-import no.sbs.ezra.security.UserPermission;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 @Service
 public class EventToJsonService {
 
-    private final EventDataRepository eventDataRepository;
     private final UserRoleRepository userRoleRepository;
+    private final EventPermissionService eventPermissionService;
+    private final BoardDataRepository boardDataRepository;
 
 
-    public EventToJsonService(EventDataRepository eventDataRepository, UserRoleRepository userRoleRepository) {
-        this.eventDataRepository = eventDataRepository;
+    public EventToJsonService(UserRoleRepository userRoleRepository, EventPermissionService eventPermissionService,
+                              BoardDataRepository boardDataRepository) {
         this.userRoleRepository = userRoleRepository;
+        this.eventPermissionService = eventPermissionService;
+        this.boardDataRepository = boardDataRepository;
     }
 
 
@@ -28,50 +31,39 @@ public class EventToJsonService {
     * Required format =
     * {
     *   title: 'my event',
-    *   description: 'my event',
     *   start: 'YYYY-MM-DDTHH:MM:SS',
     *   end: 'YYYY-MM-DDTHH:MM:SS',
     *   display: 'list-item'
     * }
     *  */
 
-    public String getAllEventsToUser(int userDataId){
-        StringBuilder object = new StringBuilder();
-        List<StringBuilder> allEventsToUser = new ArrayList<>();
+    public JSONArray getAllEventsToUser(int userDataId){
         List<UserRole> listOfBoards = userRoleRepository.findAllByUserId(userDataId);
         List<EventData> events = new ArrayList<>();
+        JSONArray array = new JSONArray();
 
         for (UserRole ur :
                 listOfBoards) {
             events.addAll(
-                    eventDataRepository.findAllByBoardIdAndAndMembershipType(
-                            ur.getBoardId(),
-                            UserPermission.valueOf(ur.getMembershipType().getPermission().toUpperCase(Locale.ROOT))
-                    ));
+                    eventPermissionService.getAllEventsFromBoardByUserPermission(
+                            boardDataRepository.findById(ur.getBoardId()).get(),
+                            userRoleRepository.findByBoardIdAndUserId(ur.getBoardId(), userDataId).getMembershipType()));
         }
 
-        for (int i = 0; i < events.size(); i++) {
-            if ( i < events.size() -1){
-                allEventsToUser.add(object
-                        .append("{\n")
-                        .append("title: '").append(events.get(i).getEventName()).append("',\n")
-                        .append("description: '").append(events.get(i).getMessage()).append("',\n")
-                        .append("start: '").append(events.get(i).getDatetime_from().toString()).append("',\n")
-                        .append("end: '").append(events.get(i).getDatetime_to().toString()).append("',\n")
-                        .append("display: 'list-item'\n")
-                        .append("},\n"));
-            } else {
-                allEventsToUser.add(object
-                        .append("{\n")
-                        .append("title: '").append(events.get(i).getEventName()).append("',\n")
-                        .append("description: '").append(events.get(i).getMessage()).append("',\n")
-                        .append("start: '").append(events.get(i).getDatetime_from().toString()).append("',\n")
-                        .append("end: '").append(events.get(i).getDatetime_to().toString()).append("',\n")
-                        .append("display: 'list-item'\n")
-                        .append("}\n"));
-            }
+        for (EventData ed :
+                events) {
+            JSONObject object = new JSONObject();
+                object.put("title", ed.getEventName());
+                object.put("id", ed.getId());
+                object.put("start", ed.getDatetime_from().toString());
+                object.put("end", ed.getDatetime_to().toString());
+                object.put("location", ed.getLocation());
+                object.put("description", ed.getMessage());
+                object.put("boardName", ed.getBoard().getName());
+                object.put("display", "list-item");
+                array.add(object);
         }
-        return allEventsToUser.toString();
+        return array;
     }
 
 
