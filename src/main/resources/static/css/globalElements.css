@@ -100,3 +100,6 @@ h2 {
 textarea{
     resize: none;
 }
+.brbrbr{
+    white-space: pre-wrap;
+}

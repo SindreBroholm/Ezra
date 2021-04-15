@@ -14,10 +14,14 @@
 <body>
 <header th:replace="fragments/headerFragment :: header"></header>
 <article id="main-grid-container">
-    <section class="leftOfMain">
-        <p>My boards</p>
-        <div th:each="board: ${myBoards}">
-            <a th:href="@{'/board/' + ${board.id}}"><span th:text="${board.name}"></span></a>
+    <section class="leftOfMain div">
+        <h1 class="textCenter">Boards</h1>
+        <div class="div eventVariableInfoBox " th:each="board: ${myBoards}">
+            <a th:href="@{'/board/' + ${board.id}}">
+                <div class="div variableField border">
+                <span class="eventInfoInput" th:text="${board.name}"></span>
+                </div>
+            </a>
         </div>
     </section>
     <main class="main">
@@ -168,12 +172,14 @@
             headerToolbar: {center: 'dayGridMonth,dayGridWeek,dayGridDay'},
             initialView: 'dayGridMonth',
             nextDayThreshold: '00:00:00',
+            firstDay: 1,
             eventTimeFormat: { // like '14:30'
                 hour: '2-digit',
                 minute: '2-digit',
                 hour12: false
             },
-            events: eventArray
+            events: eventArray,
+            eventColor: '#1D9F91'
         });
         calendar.render();
     });

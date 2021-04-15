@@ -1,6 +1,6 @@
 .boards-container {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 0.5fr 2fr 0.5fr;
     grid-template-rows: 0.15fr 0.85fr ;
     gap: 0px 0px;
     grid-template-areas:
@@ -11,6 +11,13 @@
 
 .outerSearchDiv{
     grid-area: search;
+    max-width: 500px;
+    width: 100%;
+    padding: 50px;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    flex-flow: column;
 }
 .innerSearchDiv{
     flex-direction: column;
@@ -18,10 +25,16 @@
 .outerResultDiv{
     grid-area: result;
     width: 100%;
-    justify-content: center;
-    align-content: center;
-    text-align: center;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 15px;
+    grid-auto-flow: column;
 }
 .searchResults{
-    border-bottom: 1px solid black;
+    border: 1px solid black;
+    height: 100px;
+    max-width: 300px;
+    max-height: 100px;
+    text-align: center;
+    padding: 10px 0;
 }

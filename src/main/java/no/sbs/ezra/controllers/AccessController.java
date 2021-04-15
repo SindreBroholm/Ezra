@@ -106,7 +106,7 @@ public class AccessController {
         }
     }
 
-    @GetMapping("/boards")
+    @GetMapping("/searchForBoard")
     public String getBoardsPage(){
         return "searchForBoardPage";
     }

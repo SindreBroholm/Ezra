@@ -9,7 +9,6 @@ import no.sbs.ezra.data.repositories.EventDataRepository;
 import no.sbs.ezra.data.repositories.UserDataRepository;
 import no.sbs.ezra.data.repositories.UserRoleRepository;
 import no.sbs.ezra.data.validators.EventDataValidator;
-import no.sbs.ezra.security.PasswordConfig;
 import no.sbs.ezra.servises.EventPermissionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +28,6 @@ public class BoardController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private final PasswordConfig passwordEncoder;
     private final UserDataRepository userDataRepository;
     private final BoardDataRepository boardDataRepository;
     private final UserRoleRepository userRoleRepository;
@@ -37,8 +35,7 @@ public class BoardController {
     private final EventPermissionService eventPermissionService;
 
 
-    public BoardController(PasswordConfig passwordEncoder, UserDataRepository userDataRepository, BoardDataRepository boardDataRepository, UserRoleRepository userRoleRepository, EventDataRepository eventDataRepository, EventPermissionService eventPermissionService) {
-        this.passwordEncoder = passwordEncoder;
+    public BoardController(UserDataRepository userDataRepository, BoardDataRepository boardDataRepository, UserRoleRepository userRoleRepository, EventDataRepository eventDataRepository, EventPermissionService eventPermissionService) {
         this.userDataRepository = userDataRepository;
         this.boardDataRepository = boardDataRepository;
         this.userRoleRepository = userRoleRepository;
@@ -83,21 +80,6 @@ public class BoardController {
             logger.error("BordId: " + boardId + ", does not exist");
             return "redirect:/";
         }
-    }
-
-    private EventData getNewOrExistingEvent(Integer eventId) {
-        EventData event;
-        if (eventId != null) {
-            if (eventDataRepository.findById(eventId).isPresent()) {
-                event = eventDataRepository.findById(eventId).get();
-                return event;
-            } else {
-                event = new EventData();
-            }
-        } else {
-            event = new EventData();
-        }
-        return event;
     }
 
 
@@ -145,6 +127,24 @@ public class BoardController {
         return "redirect:/board/" + boardId;
     }
 
+
+
+
+
+    private EventData getNewOrExistingEvent(Integer eventId) {
+        EventData event;
+        if (eventId != null) {
+            if (eventDataRepository.findById(eventId).isPresent()) {
+                event = eventDataRepository.findById(eventId).get();
+                return event;
+            } else {
+                event = new EventData();
+            }
+        } else {
+            event = new EventData();
+        }
+        return event;
+    }
     private BoardData getBoardData(Integer boardId) {
         BoardData board;
         if (boardDataRepository.findById(boardId).isPresent()) {
@@ -155,7 +155,6 @@ public class BoardController {
         }
         return board;
     }
-
     private void saveOrUpdateEvent(EventData event, Integer eventId) {
         if (eventDataRepository.findById(eventId).isPresent()) {
             EventData update = eventDataRepository.findById(eventId).get();
@@ -173,7 +172,6 @@ public class BoardController {
             logger.info("New event created: " + event.toString());
         }
     }
-
     private List<String> getAllValidationErrorsForEventData(BindingResult br) {
         List<ObjectError> allErrors = br.getAllErrors();
         logger.error(br.getAllErrors().toString());
