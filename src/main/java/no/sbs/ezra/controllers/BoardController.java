@@ -9,6 +9,7 @@ import no.sbs.ezra.data.repositories.EventDataRepository;
 import no.sbs.ezra.data.repositories.UserDataRepository;
 import no.sbs.ezra.data.repositories.UserRoleRepository;
 import no.sbs.ezra.data.validators.EventDataValidator;
+import no.sbs.ezra.security.UserPermission;
 import no.sbs.ezra.servises.EventPermissionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,9 @@ import javax.validation.Valid;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
+import static no.sbs.ezra.security.UserRoles.VISITOR;
 
 @Controller
 public class BoardController {
@@ -35,7 +39,9 @@ public class BoardController {
     private final EventPermissionService eventPermissionService;
 
 
-    public BoardController(UserDataRepository userDataRepository, BoardDataRepository boardDataRepository, UserRoleRepository userRoleRepository, EventDataRepository eventDataRepository, EventPermissionService eventPermissionService) {
+    public BoardController(UserDataRepository userDataRepository, BoardDataRepository boardDataRepository,
+                           UserRoleRepository userRoleRepository, EventDataRepository eventDataRepository,
+                           EventPermissionService eventPermissionService) {
         this.userDataRepository = userDataRepository;
         this.boardDataRepository = boardDataRepository;
         this.userRoleRepository = userRoleRepository;
@@ -49,6 +55,11 @@ public class BoardController {
             if (id.toString().matches("^[0-9]*$")) {
                 if (boardDataRepository.findById(id).isPresent()) {
                     UserData user = userDataRepository.findByEmail(principal.getName());
+                    try{
+                        userRoleRepository.findByBoardIdAndUserId(id, user.getId()).getMembershipType();
+                    } catch (NullPointerException ignore){
+                        userRoleRepository.save(new UserRole(user.getId(), id, UserPermission.VISITOR, false));
+                    }
                     model.addAttribute("userPermission", userRoleRepository.findByBoardIdAndUserId(id, user.getId()).getMembershipType());
                     model.addAttribute("events", eventPermissionService.getAllEventsFromBoardByUserPermission(boardDataRepository.findById(id).get(), userRoleRepository.findByBoardIdAndUserId(id, user.getId()).getMembershipType()));
                     model.addAttribute("board", boardDataRepository.findById(id).get());
@@ -81,7 +92,6 @@ public class BoardController {
             return "redirect:/";
         }
     }
-
 
     @RequestMapping(value = {"/createEvent/{boardId}", "/createEvent/{boardId}/{eventId}" }, method = RequestMethod.POST)
     public String createOrEditEvent(@Valid @ModelAttribute("eventData") EventData eventData, BindingResult br,
@@ -127,9 +137,33 @@ public class BoardController {
         return "redirect:/board/" + boardId;
     }
 
-
-
-
+    @RequestMapping(value = "/board/{boardId}/access", method = RequestMethod.POST)
+    public String increaseMembership(@PathVariable Integer boardId, Principal principal){
+        UserData user = userDataRepository.findByEmail(principal.getName());
+        BoardData board;
+        if (boardDataRepository.findById(boardId).isPresent()) {
+            board = boardDataRepository.findById(boardId).get();
+        } else {
+            return "redirect:/";
+        }
+        UserRole ur = userRoleRepository.findByBoardIdAndUserId(board.getId(), user.getId());
+        switch (ur.getMembershipType().getPermission()) {
+            case "follower" -> {
+                ur.setPendingMember(true);
+                userRoleRepository.save(ur);
+            }
+            case "visitor" -> {
+                ur.setMembershipType(UserPermission.FOLLOWER);
+                userRoleRepository.save(ur);
+                //todo: Add notification for successfully applies!
+            }
+            default -> {
+                logger.error("Something went wrong while trying to increase membership");
+                return "redirect:/";
+            }
+        }
+        return "redirect:/board/" + boardId;
+    }
 
     private EventData getNewOrExistingEvent(Integer eventId) {
         EventData event;

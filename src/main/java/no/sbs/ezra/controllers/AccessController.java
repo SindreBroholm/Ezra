@@ -12,6 +12,7 @@ import no.sbs.ezra.security.PasswordConfig;
 import no.sbs.ezra.security.UserPermission;
 import no.sbs.ezra.servises.EventPermissionService;
 import no.sbs.ezra.servises.EventToJsonService;
+import org.apache.catalina.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -55,10 +56,12 @@ public class AccessController {
         UserData user = userDataRepository.findByEmail(principal.getName());
         List<UserRole> listOfUserRoles = userRoleRepository.findAllByUserId(user.getId());
         List<BoardData> boards = new ArrayList<>();
+        List<UserRole> urBoards = new ArrayList<>();
         for (UserRole ur :
                 listOfUserRoles) {
             Optional<BoardData> temp = boardDataRepository.findById(ur.getBoardId());
             boards.add(temp.orElseThrow());
+            boards.removeIf(bd -> ur.getMembershipType().getPermission().equals("visitor"));
         }
 
         model.addAttribute("allEvents", eventToJsonService.getAllEventsToUser(user.getId()));

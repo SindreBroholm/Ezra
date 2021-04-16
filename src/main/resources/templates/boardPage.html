@@ -57,11 +57,27 @@
                 </div>
             </div>
         </div>
+        <div th:switch="${userPermission.getPermission()}">
+            <div th:case="'visitor'" class="pa30">
+                <form th:action="@{'/board/' + *{id}+ '/access'}" method="post">
+                        <button class="link" type="submit">Follow</button>
+                </form>
+            </div>
+            <div th:case="'follower'" class="pa30">
+                <form th:action="@{'/board/' + *{id}+ '/access'}" method="post">
+                    <button class="link" type="submit">Apply membership</button>
+                </form>
+            </div>
+        </div>
     </section>
 
     <!--posts-->
     <section class="main">
-        <div id="ShowEventInfo"></div>
+        <div id="ShowEventInfo" th:if="${!userPermission.getPermission().equals('visitor')}"></div>
+        <div th:if="${userPermission.getPermission().equals('visitor')}">
+            Hi there
+        </div>
+
     </section>
 
     <!--events-->
@@ -98,8 +114,6 @@
     /*<![CDATA[*/
     const events = /*[[${events}]]*/ [{id: null}];
     const showEventInfoNode = document.getElementById("ShowEventInfo")
-    console.log(showEventInfoNode.innerText === "")
-    console.log(showEventInfoNode)
 
     function displayEvent(event){
         let eventStart = new Date(Date.parse(event.datetime_from)).toLocaleDateString('en-GB', {
@@ -158,7 +172,6 @@
         `;
     }
     function populateMain(element){
-        console.log(events)
         if (element.innerText === ""){
             if (events.length !== 0){
                 if (events[0].id != null){
