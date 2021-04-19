@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Sindre Broholm Sæther">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link th:href="@{/css/headerFragment.css}" rel="stylesheet"/>
+    <link th:href="@{/css/boardPageStyles.css}" rel="stylesheet"/>
+    <link th:href="@{/css/globalElements.css}" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          rel="stylesheet">
+    <title>Ezra</title>
+</head>
+<body>
+<header th:replace="fragments/headerFragment :: header"></header>
+<div id="adminNavBar">
+    <a class="link" th:href="@{'/createEvent/' + ${board.id}}">New event</a>
+    <a class="link" th:href="@{'/boardMembers/' + ${board.id}}">Members</a>
+</div>
+<main id="main-grid-container">
+  <!--info-->
+  <section class="leftOfMain" >
+
+  </section>
+
+  <!--posts-->
+  <section class="main">
+    <div th:if="${pendingMembers.size() > 0}">
+      <div th:each="pending: ${pendingMembers}" th:object="${pending}">
+        <div>
+          <span th:text="*{u}"></span>
+        </div>
+
+        <div>
+          <form th:action="@{'/board/' + ${board.id} + '/members/'+ ${true} +'/'+ *{userId}}" method="post">
+            <button class="link" type="submit">accept</button>
+          </form>
+          <form th:action="@{'/board/' + ${board.id} + '/members/'+ ${false} +'/'+ *{userId}}" method="post">
+            <button class="delete link" type="submit">Reject</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!--events-->
+  <section class="rightOfMain">
+
+  </section>
+
+</main>
+
+
+</body>
+</html>

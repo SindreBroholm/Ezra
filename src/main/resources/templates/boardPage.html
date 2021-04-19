@@ -13,10 +13,10 @@
 </head>
 <body>
 <header th:replace="fragments/headerFragment :: header"></header>
-<div th:if="${userPermission.getPermission().equals('master') || userPermission.getPermission().equals('admin')}">
+<div th:if="${userPermission.getMembershipType().getPermission().equals('master') || userPermission.getMembershipType().getPermission().equals('admin')}">
     <div id="adminNavBar">
         <a class="link" th:href="@{'/createEvent/' + ${board.id}}">New event</a>
-        <a class="link" th:href="@{'/boardMembers/' + ${board.id}}">Members</a>
+        <a class="link" th:href="@{'/board/' + ${board.id} + '/members'}">Members</a>
     </div>
 </div>
 <main id="main-grid-container">
@@ -57,24 +57,31 @@
                 </div>
             </div>
         </div>
-        <div th:switch="${userPermission.getPermission()}">
+        <div th:switch="${userPermission.getMembershipType().getPermission()}">
             <div th:case="'visitor'" class="pa30">
                 <form th:action="@{'/board/' + *{id}+ '/access'}" method="post">
-                        <button class="link" type="submit">Follow</button>
+                    <button class="link" type="submit">Follow</button>
                 </form>
             </div>
             <div th:case="'follower'" class="pa30">
-                <form th:action="@{'/board/' + *{id}+ '/access'}" method="post">
-                    <button class="link" type="submit">Apply membership</button>
-                </form>
+                <div th:if="${!userPermission.pendingMember}">
+                    <form th:action="@{'/board/' + *{id}+ '/access'}" method="post">
+                        <button class="link" type="submit">Apply membership</button>
+                    </form>
+                </div>
             </div>
+        </div>
+        <div th:if="${userPermission.pendingMember}" class="pa30">
+            <form th:action="@{'/board/' + *{id}+ '/access'}" method="post">
+                <button class="delete link" type="submit">withdraw request</button>
+            </form>
         </div>
     </section>
 
     <!--posts-->
     <section class="main">
-        <div id="ShowEventInfo" th:if="${!userPermission.getPermission().equals('visitor')}"></div>
-        <div th:if="${userPermission.getPermission().equals('visitor')}">
+        <div id="ShowEventInfo" th:if="${!userPermission.getMembershipType().getPermission().equals('visitor')}"></div>
+        <div th:if="${userPermission.getMembershipType().getPermission().equals('visitor')}">
             Hi there
         </div>
 
@@ -96,8 +103,10 @@
                             </div>
                             <div class="toggle">
                                 <div class="alterEventBox">
-                                    <a class="link" th:href="@{'/createEvent/' + ${board.id} + '/' + ${event.id}}">Edit</a>
-                                    <form class="mlmlml" th:action="@{'/deleteEvent/' + *{board.id} + '/' + *{id}}" method="post">
+                                    <a class="link"
+                                       th:href="@{'/createEvent/' + ${board.id} + '/' + ${event.id}}">Edit</a>
+                                    <form class="mlmlml" th:action="@{'/deleteEvent/' + *{board.id} + '/' + *{id}}"
+                                          method="post">
                                         <button class="delete link">Delete</button>
                                     </form>
                                 </div>
@@ -115,7 +124,7 @@
     const events = /*[[${events}]]*/ [{id: null}];
     const showEventInfoNode = document.getElementById("ShowEventInfo")
 
-    function displayEvent(event){
+    function displayEvent(event) {
         let eventStart = new Date(Date.parse(event.datetime_from)).toLocaleDateString('en-GB', {
             weekday: 'long',
             day: 'numeric',
@@ -171,13 +180,14 @@
         </div>
         `;
     }
-    function populateMain(element){
-        if (element.innerText === ""){
-            if (events.length !== 0){
-                if (events[0].id != null){
+
+    function populateMain(element) {
+        if (element.innerText === "") {
+            if (events.length !== 0) {
+                if (events[0].id != null) {
                     showEventInfoNode.innerHTML = displayEvent(events[0])
                 }
-            }else {
+            } else {
                 showEventInfoNode.innerHTML = `
             <div id="eventSection">
             <div id="eventBox">
@@ -190,7 +200,8 @@
             }
         }
     }
-    function showEvent(id){
+
+    function showEvent(id) {
         showEventInfoNode.innerHTML = displayEvent(events[id - 1])
         let divNode = document.getElementById(id);
         let formNode = divNode.lastElementChild;
@@ -201,6 +212,7 @@
             formNode.style.display = 'none';
         }
     }
+
     populateMain(showEventInfoNode);
     /*]]>*/
 </script>

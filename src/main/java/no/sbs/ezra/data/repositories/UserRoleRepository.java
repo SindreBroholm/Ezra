@@ -10,6 +10,7 @@ public interface UserRoleRepository extends CrudRepository<UserRole, UserRoleId>
 
 
     List<UserRole> findAllByUserId(int userDataId);
+    List<UserRole> findAllByBoardId(int boardId);
 
     UserRole findByBoardIdAndUserId(int boardId, int UserId);
 }

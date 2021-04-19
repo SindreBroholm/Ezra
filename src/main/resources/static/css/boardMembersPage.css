@@ -1,0 +1,22 @@
+#main-grid-container {
+    display: grid;
+    grid-template-columns: 0.5fr 1fr 0.5fr;
+    grid-template-rows: 1.8fr 0.2fr;
+    gap: 0px 0px;
+    grid-template-areas:
+    "left main right"
+    ". . .";
+    margin-top: 50px;
+}
+.leftOfMain {
+    grid-area: left;
+    width: 100%;
+}
+.main {
+    grid-area: main;
+    max-width: 100%;
+}
+.rightOfMain {
+    grid-area: right;
+    width: 100%;
+}

@@ -23,9 +23,6 @@ import javax.validation.Valid;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-
-import static no.sbs.ezra.security.UserRoles.VISITOR;
 
 @Controller
 public class BoardController {
@@ -49,23 +46,17 @@ public class BoardController {
         this.eventPermissionService = eventPermissionService;
     }
 
-    @GetMapping("/board/{id}")
-    public String getBoardPage(Model model, @PathVariable Integer id, Principal principal) {
-        if (id > 0) {
-            if (id.toString().matches("^[0-9]*$")) {
-                if (boardDataRepository.findById(id).isPresent()) {
+    @GetMapping("/board/{boardId}")
+    public String getBoardPage(Model model, @PathVariable Integer boardId, Principal principal) {
+        if (boardId > 0) {
+            if (boardId.toString().matches("^[0-9]*$")) {
+                if (boardDataRepository.findById(boardId).isPresent()) {
                     UserData user = userDataRepository.findByEmail(principal.getName());
-                    try{
-                        userRoleRepository.findByBoardIdAndUserId(id, user.getId()).getMembershipType();
-                    } catch (NullPointerException ignore){
-                        userRoleRepository.save(new UserRole(user.getId(), id, UserPermission.VISITOR, false));
-                    }
-                    model.addAttribute("userPermission", userRoleRepository.findByBoardIdAndUserId(id, user.getId()).getMembershipType());
-                    model.addAttribute("events", eventPermissionService.getAllEventsFromBoardByUserPermission(boardDataRepository.findById(id).get(), userRoleRepository.findByBoardIdAndUserId(id, user.getId()).getMembershipType()));
-                    model.addAttribute("board", boardDataRepository.findById(id).get());
+                    handleFirstTimeVisitor(boardId, user);
+                    model.addAttribute("userPermission", userRoleRepository.findByBoardIdAndUserId(boardId, user.getId()));
+                    model.addAttribute("events", eventPermissionService.getAllEventsFromBoardByUserPermission(boardDataRepository.findById(boardId).get(), userRoleRepository.findByBoardIdAndUserId(boardId, user.getId()).getMembershipType()));
+                    model.addAttribute("board", boardDataRepository.findById(boardId).get());
                     return "boardPage";
-                } else {
-                    logger.error("Cant find boardData with id: " + id + ", id does not exist");
                 }
             }
         }
@@ -93,7 +84,37 @@ public class BoardController {
         }
     }
 
-    @RequestMapping(value = {"/createEvent/{boardId}", "/createEvent/{boardId}/{eventId}" }, method = RequestMethod.POST)
+    @GetMapping("/board/{boardId}/members")
+    public String showBoardMembersPage(Model model, @PathVariable Integer boardId, Principal principal) {
+        if (boardDataRepository.findById(boardId).isPresent()) {
+            List<UserRole> members = userRoleRepository.findAllByBoardId(boardId);
+            model.addAttribute("members", members);
+            model.addAttribute("pendingMembers", getAllPendingMembers(members));
+            model.addAttribute("board", boardDataRepository.findById(boardId).get());
+        }
+        return "boardMembersPage";
+    }
+
+    @RequestMapping(value = "/board/{boardId}/members/{value}/{userId}", method = RequestMethod.POST)
+    public String acceptOrRejectMembership(@PathVariable Integer boardId, @PathVariable boolean value, @PathVariable Integer userId) {
+        if (boardDataRepository.findById(boardId).isPresent()) {
+            if (userDataRepository.findById(userId).isPresent()) {
+                BoardData board = boardDataRepository.findById(boardId).get();
+                UserData user = userDataRepository.findById(userId).get();
+                UserRole ur = userRoleRepository.findByBoardIdAndUserId(board.getId(), user.getId());
+                if (value) {
+                    ur.setMembershipType(UserPermission.MEMBER);
+                } else {
+                    ur.setPendingMember(false);
+                }
+                userRoleRepository.save(ur);
+            }
+        }
+        return "redirect:/board/{boardId}/members";
+    }
+
+
+    @RequestMapping(value = {"/createEvent/{boardId}", "/createEvent/{boardId}/{eventId}"}, method = RequestMethod.POST)
     public String createOrEditEvent(@Valid @ModelAttribute("eventData") EventData eventData, BindingResult br,
                                     @PathVariable Integer boardId, @PathVariable(required = false) Integer eventId,
                                     Principal principal, Model model) {
@@ -123,13 +144,13 @@ public class BoardController {
     }
 
     @RequestMapping(value = "/deleteEvent/{boardId}/{eventId}", method = RequestMethod.POST)
-    public String deleteEvent(@PathVariable Integer boardId, @PathVariable Integer eventId, Principal principal){
+    public String deleteEvent(@PathVariable Integer boardId, @PathVariable Integer eventId, Principal principal) {
         UserData user = userDataRepository.findByEmail(principal.getName());
         BoardData board = getBoardData(boardId);
         if (board == null) return "redirect:/";
         UserRole role = userRoleRepository.findByBoardIdAndUserId(board.getId(), user.getId());
         if (role.getMembershipType().getPermission().equals("master") || role.getMembershipType().getPermission().equals("admin")) {
-            if (eventDataRepository.findById(eventId).isPresent()){
+            if (eventDataRepository.findById(eventId).isPresent()) {
                 logger.info("Event: " + eventDataRepository.findById(eventId).get() + ", was deleted by user with id: " + user.getId());
                 eventDataRepository.delete(eventDataRepository.findById(eventId).get());
             }
@@ -138,7 +159,7 @@ public class BoardController {
     }
 
     @RequestMapping(value = "/board/{boardId}/access", method = RequestMethod.POST)
-    public String increaseMembership(@PathVariable Integer boardId, Principal principal){
+    public String increaseMembership(@PathVariable Integer boardId, Principal principal) {
         UserData user = userDataRepository.findByEmail(principal.getName());
         BoardData board;
         if (boardDataRepository.findById(boardId).isPresent()) {
@@ -149,13 +170,16 @@ public class BoardController {
         UserRole ur = userRoleRepository.findByBoardIdAndUserId(board.getId(), user.getId());
         switch (ur.getMembershipType().getPermission()) {
             case "follower" -> {
-                ur.setPendingMember(true);
-                userRoleRepository.save(ur);
+                if (ur.isPendingMember()) {
+                    userRoleRepository.delete(ur);
+                } else {
+                    ur.setPendingMember(true);
+                    userRoleRepository.save(ur);
+                }
             }
             case "visitor" -> {
                 ur.setMembershipType(UserPermission.FOLLOWER);
                 userRoleRepository.save(ur);
-                //todo: Add notification for successfully applies!
             }
             default -> {
                 logger.error("Something went wrong while trying to increase membership");
@@ -164,6 +188,7 @@ public class BoardController {
         }
         return "redirect:/board/" + boardId;
     }
+
 
     private EventData getNewOrExistingEvent(Integer eventId) {
         EventData event;
@@ -179,6 +204,25 @@ public class BoardController {
         }
         return event;
     }
+
+    private List<UserRole> getAllPendingMembers(List<UserRole> members) {
+        List<UserRole> pendingMembers = new ArrayList<>();
+        for (UserRole ur : members) {
+            if (ur.isPendingMember()) {
+                pendingMembers.add(ur);
+            }
+        }
+        return pendingMembers;
+    }
+
+    private void handleFirstTimeVisitor(Integer boardId, UserData user) {
+        try {
+            userRoleRepository.findByBoardIdAndUserId(boardId, user.getId());
+        } catch (NullPointerException ignore) {
+            userRoleRepository.save(new UserRole(user.getId(), boardId, UserPermission.VISITOR, false));
+        }
+    }
+
     private BoardData getBoardData(Integer boardId) {
         BoardData board;
         if (boardDataRepository.findById(boardId).isPresent()) {
@@ -189,6 +233,7 @@ public class BoardController {
         }
         return board;
     }
+
     private void saveOrUpdateEvent(EventData event, Integer eventId) {
         if (eventDataRepository.findById(eventId).isPresent()) {
             EventData update = eventDataRepository.findById(eventId).get();
@@ -206,6 +251,7 @@ public class BoardController {
             logger.info("New event created: " + event.toString());
         }
     }
+
     private List<String> getAllValidationErrorsForEventData(BindingResult br) {
         List<ObjectError> allErrors = br.getAllErrors();
         logger.error(br.getAllErrors().toString());
