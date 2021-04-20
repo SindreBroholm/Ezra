@@ -15,8 +15,10 @@
 <header th:replace="fragments/headerFragment :: header"></header>
 <div th:if="${userPermission.getMembershipType().getPermission().equals('master') || userPermission.getMembershipType().getPermission().equals('admin')}">
     <div id="adminNavBar">
-        <a class="link" th:href="@{'/createEvent/' + ${board.id}}">New event</a>
-        <a class="link" th:href="@{'/board/' + ${board.id} + '/members'}">Members</a>
+        <div id="innerNavBox">
+            <a class="link" th:href="@{'/createEvent/' + ${board.id}}">New event</a>
+            <a class="link" th:href="@{'/board/' + ${board.id} + '/members'}">Members</a>
+        </div>
     </div>
 </div>
 <main id="main-grid-container">
@@ -69,6 +71,9 @@
                         <button class="link" type="submit">Apply membership</button>
                     </form>
                 </div>
+                <form th:action="@{'/board/' + *{id}+ '/unfollow'}" method="post">
+                    <button class="delete link" type="submit">Unfollow board</button>
+                </form>
             </div>
         </div>
         <div th:if="${userPermission.pendingMember}" class="pa30">
@@ -101,7 +106,7 @@
                                 <span class="infoField">event</span>
                                 <span class="eventInfoInput" th:text="*{eventName}"></span>
                             </div>
-                            <div class="toggle">
+                            <div class="toggle" style="display: none;">
                                 <div class="alterEventBox">
                                     <a class="link"
                                        th:href="@{'/createEvent/' + ${board.id} + '/' + ${event.id}}">Edit</a>

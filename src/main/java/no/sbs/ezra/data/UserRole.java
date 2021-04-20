@@ -14,12 +14,14 @@ public class UserRole {
 
 
     @Id
-    @Column(insertable = false, updatable = false)
-    private Integer userId;
+    @JoinColumn(insertable = false, updatable = false)
+    @ManyToOne(targetEntity = UserData.class)
+    private UserData user;
 
     @Id
-    @Column(insertable = false, updatable = false)
-    private Integer boardId;
+    @JoinColumn(insertable = false, updatable = false)
+    @ManyToOne(targetEntity = BoardData.class)
+    private BoardData board;
 
     @Enumerated(EnumType.STRING)
     private UserPermission membershipType;

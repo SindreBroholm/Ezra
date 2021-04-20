@@ -10,9 +10,8 @@ import no.sbs.ezra.data.validators.UserDataValidator;
 import no.sbs.ezra.data.repositories.UserDataRepository;
 import no.sbs.ezra.security.PasswordConfig;
 import no.sbs.ezra.security.UserPermission;
-import no.sbs.ezra.servises.EventPermissionService;
+import no.sbs.ezra.servises.PermissionService;
 import no.sbs.ezra.servises.EventToJsonService;
-import org.apache.catalina.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -39,16 +38,16 @@ public class AccessController {
     private final BoardDataRepository boardDataRepository;
     private final UserRoleRepository userRoleRepository;
     private final EventToJsonService eventToJsonService;
-    private final EventPermissionService eventPermissionService;
+    private final PermissionService permissionService;
 
 
-    public AccessController(PasswordConfig passwordEncoder, UserDataRepository userDataRepository, BoardDataRepository boardDataRepository, UserRoleRepository userRoleRepository, EventToJsonService eventToJsonService, EventPermissionService eventPermissionService) {
+    public AccessController(PasswordConfig passwordEncoder, UserDataRepository userDataRepository, BoardDataRepository boardDataRepository, UserRoleRepository userRoleRepository, EventToJsonService eventToJsonService, PermissionService permissionService) {
         this.passwordEncoder = passwordEncoder;
         this.userDataRepository = userDataRepository;
         this.boardDataRepository = boardDataRepository;
         this.userRoleRepository = userRoleRepository;
         this.eventToJsonService = eventToJsonService;
-        this.eventPermissionService = eventPermissionService;
+        this.permissionService = permissionService;
     }
 
     @GetMapping("/")
@@ -59,7 +58,7 @@ public class AccessController {
         List<UserRole> urBoards = new ArrayList<>();
         for (UserRole ur :
                 listOfUserRoles) {
-            Optional<BoardData> temp = boardDataRepository.findById(ur.getBoardId());
+            Optional<BoardData> temp = boardDataRepository.findById(ur.getBoard().getId());
             boards.add(temp.orElseThrow());
             boards.removeIf(bd -> ur.getMembershipType().getPermission().equals("visitor"));
         }
@@ -152,7 +151,7 @@ public class AccessController {
         } else {
             boardDataRepository.save(boardData);
             logger.info(boardData.getName() + " was successfully created by: " + userDataRepository.findByEmail(principal.getName()));
-            userRoleRepository.save(new UserRole(user.getId(), boardData.getId(), UserPermission.MASTER, false));
+            userRoleRepository.save(new UserRole(user, boardData, UserPermission.MASTER, false));
             logger.info("UserRole appended successfully");
         }
         return "redirect:/";

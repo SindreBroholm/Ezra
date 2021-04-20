@@ -12,11 +12,11 @@ import java.util.Comparator;
 import java.util.List;
 
 @Service
-public class EventPermissionService {
+public class PermissionService {
 
     private final EventDataRepository eventDataRepository;
 
-    public EventPermissionService(EventDataRepository eventDataRepository) {
+    public PermissionService(EventDataRepository eventDataRepository) {
         this.eventDataRepository = eventDataRepository;
     }
 
@@ -40,5 +40,16 @@ public class EventPermissionService {
                 .thenComparing(EventData::getDatetime_to)
         );
         return events;
+    }
+
+    public boolean doesUserHaveAdminRights(UserPermission permission) {
+        switch (permission.getPermission()) {
+            case "master", "admin" -> {
+                return true;
+            }
+            default -> {
+                return false;
+            }
+        }
     }
 }

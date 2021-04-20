@@ -1,7 +1,10 @@
 package no.sbs.ezra.security;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public enum UserPermission {
-    MASTER("master"),
+     MASTER("master"),
     ADMIN("admin"),
     MEMBER("member"),
     FOLLOWER("follower"),

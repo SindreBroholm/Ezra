@@ -15,14 +15,14 @@ import java.util.List;
 public class EventToJsonService {
 
     private final UserRoleRepository userRoleRepository;
-    private final EventPermissionService eventPermissionService;
+    private final PermissionService permissionService;
     private final BoardDataRepository boardDataRepository;
 
 
-    public EventToJsonService(UserRoleRepository userRoleRepository, EventPermissionService eventPermissionService,
+    public EventToJsonService(UserRoleRepository userRoleRepository, PermissionService permissionService,
                               BoardDataRepository boardDataRepository) {
         this.userRoleRepository = userRoleRepository;
-        this.eventPermissionService = eventPermissionService;
+        this.permissionService = permissionService;
         this.boardDataRepository = boardDataRepository;
     }
 
@@ -40,9 +40,9 @@ public class EventToJsonService {
         for (UserRole ur :
                 listOfBoards) {
             events.addAll(
-                    eventPermissionService.getAllEventsFromBoardByUserPermission(
-                            boardDataRepository.findById(ur.getBoardId()).get(),
-                            userRoleRepository.findByBoardIdAndUserId(ur.getBoardId(), userDataId).getMembershipType()));
+                    permissionService.getAllEventsFromBoardByUserPermission(
+                            boardDataRepository.findById(ur.getBoard().getId()).get(),
+                            userRoleRepository.findByBoardIdAndUserId(ur.getBoard().getId(), userDataId).getMembershipType()));
         }
 
         for (EventData ed :

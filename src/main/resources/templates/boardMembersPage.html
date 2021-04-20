@@ -6,7 +6,7 @@
     <meta name="author" content="Sindre Broholm Sæther">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link th:href="@{/css/headerFragment.css}" rel="stylesheet"/>
-    <link th:href="@{/css/boardPageStyles.css}" rel="stylesheet"/>
+    <link th:href="@{/css/boardMembersPage.css}" rel="stylesheet"/>
     <link th:href="@{/css/globalElements.css}" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
           rel="stylesheet">
@@ -15,8 +15,10 @@
 <body>
 <header th:replace="fragments/headerFragment :: header"></header>
 <div id="adminNavBar">
-    <a class="link" th:href="@{'/createEvent/' + ${board.id}}">New event</a>
-    <a class="link" th:href="@{'/boardMembers/' + ${board.id}}">Members</a>
+    <div id="innerNavBox">
+        <a class="link" th:href="@{'/createEvent/' + ${board.id}}">New event</a>
+        <a class="link" th:href="@{'/board/' + ${board.id} + '/members'}">Members</a>
+    </div>
 </div>
 <main id="main-grid-container">
   <!--info-->
@@ -24,19 +26,24 @@
 
   </section>
 
-  <!--posts-->
+  <!--pending members-->
   <section class="main">
-    <div th:if="${pendingMembers.size() > 0}">
-      <div th:each="pending: ${pendingMembers}" th:object="${pending}">
+      <h2>Pending membership</h2>
+    <div th:if="${pendingMembers.size() > 0}" class="gridContainer">
+      <div th:each="pending: ${pendingMembers}" th:object="${pending}" class="borderBox">
         <div>
-          <span th:text="*{u}"></span>
+          <span th:text="*{user.getFirstname() + ' ' + user.getLastname()}" class="infoInput"></span>
+          <span th:text="*{user.email}" class="infoInput"></span>
+          <span th:text="*{user.phone_number}" class="infoInput"></span>
         </div>
 
-        <div>
-          <form th:action="@{'/board/' + ${board.id} + '/members/'+ ${true} +'/'+ *{userId}}" method="post">
-            <button class="link" type="submit">accept</button>
+        <div class="pendingMemberFormBox">
+          <form th:action="@{'/board/' + ${board.id} + '/members/value/'+ *{user.id}}" method="post" class="pendingMemberForm">
+              <input type="text" name="value" th:value="MEMBER" hidden>
+            <button class="link" type="submit">Accept</button>
           </form>
-          <form th:action="@{'/board/' + ${board.id} + '/members/'+ ${false} +'/'+ *{userId}}" method="post">
+          <form th:action="@{'/board/' + ${board.id} + '/members/value/'+ *{user.id}}" method="post" class="pendingMemberForm">
+              <input type="text" name="value" th:value="FOLLOWER" hidden>
             <button class="delete link" type="submit">Reject</button>
           </form>
         </div>
@@ -45,13 +52,42 @@
 
   </section>
 
-  <!--events-->
+  <!--members-->
   <section class="rightOfMain">
-
+      <h2>Members</h2>
+      <div class="membersGridContainer">
+          <div th:each="member: ${members}" th:object="${member}" class="borderBox" th:id="${memberStat.count}" onclick="toggle(this.id)">
+              <div>
+                  <span th:text="*{user.firstname + ' ' + user.lastname}" class="infoInput"></span>
+                  <span th:text="*{user.email}" class="infoInput"></span>
+                  <span th:text="*{user.phone_number}" class="infoInput"></span>
+                  <span th:text="*{membershipType.getPermission().toUpperCase()}" class="infoInput"></span>
+              </div>
+              <div class="toggleBox" style="display: none;">
+                  <form th:action="@{'/board/'+ ${board.id}+'/members/value/'+ *{user.id}}" method="post" class="memberForm">
+                      <select name="value">
+                          <option th:each="value: ${permissions}" th:value="${value}" th:text="${value}"></option>
+                      </select>
+                      <button class="link" type="submit">Submit</button>
+                  </form>
+              </div>
+          </div>
+      </div>
   </section>
 
 </main>
 
+<script>
+    function toggle(id) {
+        let divNode = document.getElementById(id);
+        let formNode = divNode.lastElementChild;
 
+        if (formNode.style.display === 'none') {
+            formNode.style.display = 'block';
+        } else {
+           /* formNode.style.display = 'none';*/
+        }
+    }
+</script>
 </body>
 </html>
