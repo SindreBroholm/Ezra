@@ -91,13 +91,7 @@ public class AccessController {
             logger.error("Failed to support UserData class and or validate UserData");
         }
         if (br.hasErrors()) {
-            List<ObjectError> allErrors = br.getAllErrors();
-            List<String> errors = new ArrayList<>();
-            for (ObjectError e :
-                    allErrors) {
-                errors.add(e.getDefaultMessage());
-            }
-            model.addAttribute("errors", errors);
+            model.addAttribute("errors", getErrorMessages(br));
             return "signupPage";
         } else {
             userData.setPassword(passwordEncoder.passwordEncoder().encode(userData.getPassword()));
@@ -106,6 +100,16 @@ public class AccessController {
             redirectAttributes.addFlashAttribute("username", userData.getEmail());
             return "redirect:/login";
         }
+    }
+
+    private List<String> getErrorMessages(BindingResult br) {
+        List<ObjectError> allErrors = br.getAllErrors();
+        List<String> errors = new ArrayList<>();
+        for (ObjectError e :
+                allErrors) {
+            errors.add(e.getDefaultMessage());
+        }
+        return errors;
     }
 
     @GetMapping("/searchForBoard")
@@ -138,7 +142,7 @@ public class AccessController {
     @RequestMapping(value = "/createBoard", method = RequestMethod.POST)
     public String createNewBoard(@Valid @ModelAttribute("BoardData") BoardData boardData, BindingResult br,
                                  RedirectAttributes redirectAttributes, Principal principal, Model model){
-        BoardDataValidator validator = new BoardDataValidator(boardDataRepository);
+        BoardDataValidator validator = new BoardDataValidator();
         UserData user = userDataRepository.findByEmail(principal.getName());
         model.addAttribute("user", user);
         if (validator.supports(boardData.getClass())) {

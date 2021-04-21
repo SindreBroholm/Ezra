@@ -14,7 +14,7 @@
 <main class="boards-container">
     <div class="outerSearchDiv">
         <div class="innerSearchDiv">
-            <form th:action="@{/searchForBoard}" method="post">
+            <form th:action="@{/searchForBoard}" method="post" class="searchForm">
                 <label for="keyword"></label>
                 <input type="text" name="keyword" id="keyword" th:value="${keyword}" placeholder="Search for board"/>
                 <button type="submit">Search</button>
@@ -23,12 +23,13 @@
     </div>
     <div class="outerResultDiv">
         <div th:each="board : ${searchResults}" th:object="${board}">
-            <div class="searchResults" th:if="*{!name.equals('noResult')}">
-                <h2 th:text="*{name}"></h2>
-                <p th:text="*{contactName}"></p>
-            </div>
-            <div class="searchResults" th:if="*{name.equals('noResult')}">
-                <h3>No board match that search!</h3>
+            <a th:href="@{'/board/' + ${board.id} }" th:if="*{!name.equals('noResult')}" class="borderBox">
+                <h2 th:text="*{name}" class="resultInput"></h2>
+                <p th:text="*{contactName} + ' | ' + *{contactNumber}" class="resultInput"></p>
+                <p th:text="*{homepage}" class="resultInput"></p>
+            </a>
+            <div th:if="*{name.equals('noResult')}">
+                <h2>No board match that search!</h2>
             </div>
         </div>
     </div>

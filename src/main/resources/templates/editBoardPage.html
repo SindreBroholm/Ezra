@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="author" content="Sindre Broholm Sæther">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link th:href="@{/css/loginPageStyle.css}" rel="stylesheet"/>
+  <link th:href="@{/css/globalElements.css}" rel="stylesheet"/>
+  <link th:href="@{/js/notifications/dist/notifications.css}" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+        rel="stylesheet">
+  <title>Ezra</title>
+</head>
+<body>
+<main class="login-container">
+  <div id="loginHalf">
+    <div class="loginFormBox">
+      <div class="logoImg">
+        <h1>New board</h1>
+      </div>
+      <div id="formBox">
+        <form th:action="@{'/board/' + ${board.id} + '/edit'}" method="post" th:object="${board}">
+          <div id="loginBoxElements">
+            <div class="InputBox">
+              <div class="InputField">
+                <label class="label">
+                  <span class="span">Name</span>
+                  <input type="text" class="input" th:field="*{name}" th:errorclass="filderror" autofocus="autofocus">
+                </label>
+              </div>
+            </div>
+            <div class="InputBox">
+              <div class="InputField">
+                <label class="label">
+                  <span class="span">Contact name</span>
+                  <input type="text" class="input" th:field="*{contactName}" th:placeholder="*{contactName}" th:errorclass="filderror">
+                </label>
+              </div>
+            </div>
+            <div class="InputBox">
+              <div class="InputField">
+                <label class="label">
+                  <span class="span">Contact phone number</span>
+                  <input type="text" class="input" th:field="*{contactNumber}" th:placeholder="*{contactNumber}" th:errorclass="filderror">
+                </label>
+              </div>
+            </div>
+            <div class="InputBox">
+              <div class="InputField">
+                <label class="label">
+                  <span class="span">Contact e-mail</span>
+                  <input type="text" class="input" th:field="*{contactEmail}" th:placeholder="*{contactEmail}" th:errorclass="filderror">
+                </label>
+              </div>
+            </div>
+            <div class="InputBox">
+              <div class="InputField">
+                <label class="label">
+                  <span class="span">Homepage</span>
+                  <input type="text" class="input" th:field="*{homepage}" th:placeholder="*{homepage}" th:errorclass="filderror">
+                </label>
+              </div>
+            </div>
+            <div class="InputBox">
+              <div class="InputField">
+                <label class="label">
+                  <span class="span">Permanent delete?</span>
+                  <input type="text" class="input" name="value" placeholder="type: |DELETE| to confirm">
+                </label>
+              </div>
+            </div>
+            <div th:if="${errors.size() > 0}">
+              <span id="hasErrors"></span>
+            </div>
+            <div class="InputBox">
+              <button type="submit">Edit</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div id="imgHalf"></div>
+</main>
+<script th:src="@{/js/notifications/dist/notifications.js}"></script>
+<script th:inline="javascript">
+  /*<![CDATA[*/
+  const errors = /*[[${errors}]]*/ ['ph'];
+  let errorNode = document.getElementById("hasErrors")
+  console.log(errors.toString())
+  if (errorNode != null) {
+    const myNotify = window.createNotification({
+      positionClass: 'nfc-top-right',
+      displayCloseButton: false,
+      onclick: true,
+      showDuration: 35000,
+      theme: 'error'
+    });
+    if (errors[0] !== undefined) {
+      for (let i = 0; i < errors.length; i++) {
+        myNotify({
+          title: "Error",
+          message: errors[i]
+        })
+      }
+    }
+  }
+  /*]]>*/
+</script>
+</body>
+</html>

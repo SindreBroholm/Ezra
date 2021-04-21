@@ -15,7 +15,7 @@ create table ezra.user_data
 create table ezra.board_data
 (
     Id             int unique auto_increment,
-    Name           varchar(100) not null unique,
+    Name           varchar(100) not null,
     Contact_Name   varchar(100) not null,
     Contact_Number varchar(15),
     Contact_Email  varchar(320) not null,

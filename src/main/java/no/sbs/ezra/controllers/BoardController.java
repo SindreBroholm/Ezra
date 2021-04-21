@@ -8,6 +8,7 @@ import no.sbs.ezra.data.repositories.BoardDataRepository;
 import no.sbs.ezra.data.repositories.EventDataRepository;
 import no.sbs.ezra.data.repositories.UserDataRepository;
 import no.sbs.ezra.data.repositories.UserRoleRepository;
+import no.sbs.ezra.data.validators.BoardDataValidator;
 import no.sbs.ezra.data.validators.EventDataValidator;
 import no.sbs.ezra.security.UserPermission;
 import no.sbs.ezra.servises.PermissionService;
@@ -18,6 +19,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 import java.security.Principal;
@@ -84,7 +86,7 @@ public class BoardController {
     }
 
     @GetMapping("/board/{boardId}/members")
-    public String showBoardMembersPage(Model model, @PathVariable Integer boardId, Principal principal) {
+    public String getBoardMembersPage(Model model, @PathVariable Integer boardId, Principal principal) {
         if (boardDataRepository.findById(boardId).isPresent()) {
             if (permissionService.doesUserHaveAdminRights(userRoleRepository.findByBoardIdAndUserId(boardId, userDataRepository.findByEmail(principal.getName()).getId()).getMembershipType())) {
                 model.addAttribute("members", userRoleRepository.findAllByBoardIdAndMembershipTypeOrMembershipType(boardId, UserPermission.MEMBER, UserPermission.ADMIN));
@@ -92,6 +94,51 @@ public class BoardController {
                 model.addAttribute("board", boardDataRepository.findById(boardId).get());
                 model.addAttribute("permissions", userPermissionsInteraction());
                 return "boardMembersPage";
+            }
+        }
+        return "redirect:/";
+    }
+
+    @GetMapping("/board/{boardId}/edit")
+    public String getEditBoardPage(Model model, @PathVariable Integer boardId, Principal principal){
+        if (boardDataRepository.findById(boardId).isPresent()){
+            UserData user = userDataRepository.findByEmail(principal.getName());
+            if (userRoleRepository.findByBoardIdAndUserId(boardId, user.getId()).getMembershipType() == UserPermission.MASTER){
+                model.addAttribute("board", boardDataRepository.findById(boardId).get());
+                model.addAttribute("errors", new ArrayList<>());
+                return "editBoardPage";
+            }
+        }
+        return "redirect:/";
+    }
+    @RequestMapping( value = "/board/{boardId}/edit", method = RequestMethod.POST)
+    public String editOrDeleteBoard(@PathVariable Integer boardId,@RequestParam(name = "value", required = false) String value,
+                                    @ModelAttribute("BoardData") BoardData boardData, BindingResult br, Model model){
+        if (boardDataRepository.findById(boardId).isPresent()){
+            BoardDataValidator validator = new BoardDataValidator();
+            if (validator.supports(boardData.getClass())){
+                validator.validate(boardData, br);
+                if (br.hasErrors()){
+                    model.addAttribute("errors", getErrorMessages(br));
+                    model.addAttribute("board", boardDataRepository.findById(boardId).get());
+                    System.out.println(br.getAllErrors());
+                    return "editBoardPage";
+                } else {
+                    if (value.length() == 6) {
+                        if (value.equals("DELETE")){
+                            boardDataRepository.delete(boardDataRepository.findById(boardId).get());
+                        }
+                    }else {
+                        BoardData update = boardDataRepository.findById(boardId).get();
+                        update.setContactEmail(boardData.getContactEmail());
+                        update.setContactNumber(boardData.getContactNumber());
+                        update.setContactName(boardData.getContactName());
+                        update.setHomepage(boardData.getHomepage());
+                        update.setName(boardData.getName());
+                        boardDataRepository.save(update);
+                        return "redirect:/board/" + boardId;
+                    }
+                }
             }
         }
         return "redirect:/";
@@ -238,9 +285,9 @@ public class BoardController {
 
     public List<UserPermission> userPermissionsInteraction() {
         List<UserPermission> temp = new ArrayList<>();
-        temp.add(UserPermission.ADMIN);
         temp.add(UserPermission.MEMBER);
         temp.add(UserPermission.FOLLOWER);
+        temp.add(UserPermission.ADMIN);
         return temp;
     }
 
@@ -255,13 +302,10 @@ public class BoardController {
             update.setDatetime_to(event.getDatetime_to());
             update.setDatetime_from(event.getDatetime_from());
             eventDataRepository.save(update);
-            logger.info("Event updated: " + event.toString());
         } else {
             eventDataRepository.save(event);
-            logger.info("New event created: " + event.toString());
         }
     }
-
     private List<String> getAllValidationErrorsForEventData(BindingResult br) {
         List<ObjectError> allErrors = br.getAllErrors();
         logger.error(br.getAllErrors().toString());
@@ -271,6 +315,15 @@ public class BoardController {
             errors.add(e.getDefaultMessage());
         }
         logger.error("EventData validation errors: " + errors.toString());
+        return errors;
+    }
+    private List<String> getErrorMessages(BindingResult br) {
+        List<ObjectError> allErrors = br.getAllErrors();
+        List<String> errors = new ArrayList<>();
+        for (ObjectError e :
+                allErrors) {
+            errors.add(e.getDefaultMessage());
+        }
         return errors;
     }
 }

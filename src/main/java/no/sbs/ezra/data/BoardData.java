@@ -19,13 +19,11 @@ public class BoardData {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @NotEmpty
     @NonNull
-    @Unique
     @Size(min = 3, max = 100)
     private String name;
 
-    @NotEmpty
+    @NonNull
     @Size(min = 2, max = 100)
     private String contactName;
 
@@ -33,7 +31,7 @@ public class BoardData {
     @Size(max = 15, min = 6)
     private String contactNumber;
 
-    @NotEmpty
+
     @NonNull
     @Size(min = 5, max = 320)
     @Email
@@ -45,11 +43,9 @@ public class BoardData {
     public BoardData() {
     }
 
-    public BoardData(@NotEmpty @NonNull @Unique @Size(min = 3, max = 100) String name,
-                     @NotEmpty @Size(min = 2, max = 100) String contactName,
-                     @Size(max = 15, min = 6) String contactNumber,
-                     @NotEmpty @NonNull @Size(min = 5, max = 320) @Email String contactEmail,
-                     @Size(max = 100) String homepage) {
+    public BoardData(@NonNull String name, @NonNull String contactName,
+                     String contactNumber, @NonNull String contactEmail,
+                     String homepage) {
         this.name = name;
         this.contactName = contactName;
         this.contactNumber = contactNumber;
