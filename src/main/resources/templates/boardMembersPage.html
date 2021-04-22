@@ -38,11 +38,11 @@
         </div>
 
         <div class="pendingMemberFormBox">
-          <form th:action="@{'/board/' + ${board.id} + '/members/value/'+ *{user.id}}" method="post" class="pendingMemberForm">
+          <form th:action="@{'/board/' + ${board.id} + '/members/'+ *{user.id}}" method="post" class="pendingMemberForm">
               <input type="text" name="value" th:value="MEMBER" hidden>
             <button class="link" type="submit">Accept</button>
           </form>
-          <form th:action="@{'/board/' + ${board.id} + '/members/value/'+ *{user.id}}" method="post" class="pendingMemberForm">
+          <form th:action="@{'/board/' + ${board.id} + '/members/'+ *{user.id}}" method="post" class="pendingMemberForm">
               <input type="text" name="value" th:value="FOLLOWER" hidden>
             <button class="delete link" type="submit">Reject</button>
           </form>
@@ -64,7 +64,7 @@
                   <span th:text="*{membershipType.getPermission().toUpperCase()}" class="infoInput"></span>
               </div>
               <div class="toggleBox" style="display: none;">
-                  <form th:action="@{'/board/'+ ${board.id}+'/members/value/'+ *{user.id}}" method="post" class="memberForm">
+                  <form th:action="@{'/board/'+ ${board.id}+'/members/'+ *{user.id}}" method="post" class="memberForm">
                       <select name="value">
                           <option th:each="value: ${permissions}" th:value="${value}" th:text="${value}"></option>
                       </select>

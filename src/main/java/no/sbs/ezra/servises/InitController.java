@@ -7,13 +7,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class InitContoller {
+public class InitController {
 
     private final UserDataRepository userDataRepository;
     private final PasswordConfig passwordConfig;
 
 
-    public InitContoller(UserDataRepository userDataRepository, PasswordConfig passwordConfig) {
+    public InitController(UserDataRepository userDataRepository, PasswordConfig passwordConfig) {
         this.userDataRepository = userDataRepository;
         this.passwordConfig = passwordConfig;
     }

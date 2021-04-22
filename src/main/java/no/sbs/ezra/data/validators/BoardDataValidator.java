@@ -2,7 +2,6 @@ package no.sbs.ezra.data.validators;
 
 import lombok.NonNull;
 import no.sbs.ezra.data.BoardData;
-import no.sbs.ezra.data.repositories.BoardDataRepository;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
@@ -47,6 +46,11 @@ public class BoardDataValidator implements Validator {
         }
         if (board.getHomepage().length() > 100){
             errors.rejectValue("homepage", "homepage.error", "Homepage address is to long");
+        }
+        if (board.getDescription() != null){
+            if (board.getDescription().length() > 5000){
+                errors.rejectValue("description", "description.error", "Description is to long");
+            }
         }
     }
 }

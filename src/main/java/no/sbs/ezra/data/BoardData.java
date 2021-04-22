@@ -3,12 +3,9 @@ package no.sbs.ezra.data;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.checkerframework.common.aliasing.qual.Unique;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
 
 @Entity
 @Data
@@ -20,25 +17,20 @@ public class BoardData {
     private Integer id;
 
     @NonNull
-    @Size(min = 3, max = 100)
     private String name;
 
     @NonNull
-    @Size(min = 2, max = 100)
     private String contactName;
 
-
-    @Size(max = 15, min = 6)
     private String contactNumber;
 
-
     @NonNull
-    @Size(min = 5, max = 320)
     @Email
     private String contactEmail;
 
-    @Size(max = 100)
     private String homepage;
+
+    private String description;
 
     public BoardData() {
     }

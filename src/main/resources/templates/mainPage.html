@@ -16,10 +16,10 @@
 <article id="main-grid-container">
     <section class="leftOfMain div">
         <h1 class="textCenter">Boards</h1>
-        <div class="div eventVariableInfoBox " th:each="board: ${myBoards}">
-            <a th:href="@{'/board/' + ${board.id}}">
+        <div class="div eventVariableInfoBox " th:each="ur: ${UserRoles}">
+            <a th:href="@{'/board/' + ${ur.board.id}}">
                 <div class="div variableField border">
-                <span class="eventInfoInput" th:text="${board.name}"></span>
+                <span class="eventInfoInput" th:text="${ur.board.name}"></span>
                 </div>
             </a>
         </div>

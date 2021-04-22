@@ -2,14 +2,11 @@ package no.sbs.ezra.data.validators;
 
 import lombok.NonNull;
 import no.sbs.ezra.data.EventData;
-import no.sbs.ezra.data.repositories.EventDataRepository;
-import no.sbs.ezra.security.UserPermission;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
 import java.time.LocalDateTime;
-import java.util.Locale;
 
 public class EventDataValidator implements Validator {
 
@@ -26,7 +23,6 @@ public class EventDataValidator implements Validator {
         if (event.getBoard() == null){
             errors.rejectValue("board", "board.error", "Invalid value");
         }
-
 
         if (event.getMessage().length() > 5000) {
             errors.rejectValue("message", "message.error", "Event description is to long");
@@ -45,9 +41,6 @@ public class EventDataValidator implements Validator {
 
 
         if (event.getMembershipType() != null){
-            /*if (event.getMembershipType()){
-                errors.rejectValue("membershipType", "membershipType.error", "Invalid value");
-            }*/
             if (event.getMembershipType().getPermission().length() > 150){
                 errors.rejectValue("membershipType", "membershipType.error", "Invalid value");
             }

@@ -75,5 +75,14 @@ create table ezra.notification
     foreign key (Membership_Type) references membership (Type) ON DELETE CASCADE
 );
 
-
-select * from ezra.user_role ur where User_Id = 3;
+create table ezra.family
+(
+    Id              int auto_increment unique not null,
+    User_Id         int                       not null,
+    Member_Id       int                       not null,
+    Pending_Request boolean,
+    Family_ID       int                       not null,
+    primary key (Id),
+    foreign key (User_Id) references user_data (Id) ON DELETE CASCADE,
+    foreign key (Member_Id) references user_data (Id) ON DELETE CASCADE
+);

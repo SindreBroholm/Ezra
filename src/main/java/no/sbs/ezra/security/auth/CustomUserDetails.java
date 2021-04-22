@@ -7,12 +7,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 
 public class CustomUserDetails implements UserDetails {
 
-    private UserData user;
+    private final UserData user;
 
     public CustomUserDetails(UserData user) {
         this.user = user;
@@ -20,8 +19,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        final List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("USER"));
-        return authorities;
+        return Collections.<GrantedAuthority>singletonList(new SimpleGrantedAuthority("USER"));
     }
 
     @Override

@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link th:href="@{/css/loginPageStyle.css}" rel="stylesheet"/>
     <link th:href="@{/css/globalElements.css}" rel="stylesheet"/>
+    <link th:href="@{/js/notifications/dist/notifications.css}" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
           rel="stylesheet">
     <title>Ezra</title>
@@ -15,7 +16,6 @@
     <div id="loginHalf">
         <div class="loginFormBox">
             <div class="logoImg">
-                <!--<img th:src="@{/img/EzraLogo.png}" alt="logo" height="70px">-->
                 <h1>New board</h1>
             </div>
             <div id="formBox">
@@ -61,17 +61,6 @@
                                 </label>
                             </div>
                         </div>
-                        <div class="InputBox">
-                            <div class="InputField">Delete board?
-                                <label class="label">
-                                    <span class="span">Homepage</span>
-                                    <input type="text" class="input" th:field="*{homepage}" th:errorclass="filderror">
-                                </label>
-                            </div>
-                        </div>
-
-
-
                         <div th:if="${#fields.hasErrors()}">
                             <span id="hasErrors"></span>
                         </div>
@@ -85,7 +74,8 @@
     </div>
     <div id="imgHalf"></div>
 </main>
-<script>
+<script th:src="@{/js/notifications/dist/notifications.js}"></script>
+<script th:inline="javascript">
     /*<![CDATA[*/
     const errors = /*[[${errors}]]*/ ['ph'];
     let errorNode = document.getElementById("hasErrors")

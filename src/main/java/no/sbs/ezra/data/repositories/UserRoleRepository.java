@@ -11,9 +11,8 @@ public interface UserRoleRepository extends CrudRepository<UserRole, UserRoleId>
 
 
     List<UserRole> findAllByUserId(int userDataId);
-    List<UserRole> findAllByBoardId(int boardId);
     List<UserRole> findAllByBoardIdAndMembershipTypeOrMembershipType(int boardId, UserPermission up1, UserPermission up2);
     List<UserRole> findAllByBoardIdAndMembershipTypeAndPendingMember(int boardId, UserPermission up1, boolean isTrue);
-
+    List<UserRole> findAllByUserIdAndMembershipTypeIsNot(Integer userId, UserPermission permission);
     UserRole findByBoardIdAndUserId(int boardId, int UserId);
 }
