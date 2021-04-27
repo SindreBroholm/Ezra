@@ -3,7 +3,9 @@ package no.sbs.ezra.servises;
 import no.sbs.ezra.data.BoardData;
 import no.sbs.ezra.data.UserData;
 import no.sbs.ezra.data.repositories.UserDataRepository;
-import org.apache.catalina.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -13,8 +15,9 @@ import java.security.Principal;
 @Service
 public class EmailService {
 
-    private JavaMailSender javaMailSender;
-    private UserDataRepository userDataRepository;
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final JavaMailSender javaMailSender;
+    private final UserDataRepository userDataRepository;
 
     public EmailService(JavaMailSender javaMailSender, UserDataRepository userDataRepository) {
         this.javaMailSender = javaMailSender;
@@ -31,10 +34,12 @@ public class EmailService {
         simpleMailMessage.setTo(toUser);
         simpleMailMessage.setSubject(topic);
         simpleMailMessage.setText(body);
-        javaMailSender.send(simpleMailMessage);
-    }
-    public void forgotPassword(){
-
+        try{
+            javaMailSender.send(simpleMailMessage);
+        } catch (MailException e){
+            logger.error("Unable to send inviteToBoard email with EmailService");
+            e.getMessage();
+        }
     }
 
     public void sendFamilyMemberRequest(String sendTo, Principal principal) {
@@ -50,6 +55,11 @@ public class EmailService {
         simpleMailMessage.setTo(sendTo);
         simpleMailMessage.setText(body);
         simpleMailMessage.setSubject(topic);
-        javaMailSender.send(simpleMailMessage);
+        try{
+            javaMailSender.send(simpleMailMessage);
+        } catch (MailException e){
+            logger.error("Unable to send familyMemberRequest with EmailService");
+            e.getMessage();
+        }
     }
 }

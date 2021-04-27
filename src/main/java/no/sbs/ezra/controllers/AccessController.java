@@ -5,8 +5,8 @@ import no.sbs.ezra.data.*;
 import no.sbs.ezra.data.repositories.*;
 import no.sbs.ezra.data.validators.UserDataValidator;
 import no.sbs.ezra.security.PasswordConfig;
-import no.sbs.ezra.security.UserPermission;
-import no.sbs.ezra.servises.EventToJsonService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -15,22 +15,19 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
-
-
 
 @Controller
 @AllArgsConstructor
 public class AccessController {
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     private final PasswordConfig passwordEncoder;
     private final UserDataRepository userDataRepository;
     private final BoardDataRepository boardDataRepository;
-    private final UserRoleRepository userRoleRepository;
     private final FamilyRequestRepository familyRequestRepository;
-    private final EventToJsonService eventToJsonService;
     private final FamilyDataRepository familyDataRepository;
 
 
@@ -47,7 +44,6 @@ public class AccessController {
     }
 
     /*todo: implement resetPassword !*/
-
 
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
     public String createNewUser(@Valid @ModelAttribute("UserData") UserData userData, BindingResult br,
@@ -66,16 +62,15 @@ public class AccessController {
                 FamilyRequest haveJoined = familyRequestRepository.findByMemberEmail(userData.getEmail()).get();
                 haveJoined.setHaveJoined(true);
                 familyRequestRepository.save(haveJoined);
-                UserData sender = userDataRepository.findById(haveJoined.getUser().getId()).get();
-                familyDataRepository.save(new FamilyData(sender, userData, true, false));
+                if (userDataRepository.findById(haveJoined.getUser().getId()).isPresent()){
+                    UserData sender = userDataRepository.findById(haveJoined.getUser().getId()).get();
+                    familyDataRepository.save(new FamilyData(sender, userData, true, false));
+                }
             }
-
-
             redirectAttributes.addFlashAttribute("username", userData.getEmail());
             return "redirect:/login";
         }
     }
-
 
     @GetMapping("/searchForBoard")
     public String getSearchForBoardPage() {
@@ -88,7 +83,6 @@ public class AccessController {
         model.addAttribute("keyword", keyword);
         return "searchForBoardPage";
     }
-
 
     private List<BoardData> getSearchResults(String keyword) {
         List<BoardData> searchResults;

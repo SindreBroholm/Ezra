@@ -6,6 +6,8 @@ import no.sbs.ezra.data.repositories.BoardDataRepository;
 import no.sbs.ezra.data.repositories.UserRoleRepository;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -14,6 +16,7 @@ import java.util.List;
 @Service
 public class EventToJsonService {
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final UserRoleRepository userRoleRepository;
     private final PermissionService permissionService;
     private final BoardDataRepository boardDataRepository;
@@ -63,48 +66,61 @@ public class EventToJsonService {
                     permissionService.getAllEventsFromBoardByUserPermission(
                             boardDataRepository.findById(ur.getBoard().getId()).get(),
                             userRoleRepository.findByBoardIdAndUserId(ur.getBoard().getId(), ur.getUser().getId()).getMembershipType()));
-            array.addAll(SetEventDataToJSONObjectForFamilyMembers(events, ur));
+            try{
+                array.addAll(SetEventDataToJSONObjectForFamilyMembers(events, ur));
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+            }
 
         }
 
         return array;
     }
+
+
 
     private JSONArray SetEventDataToJSONObject(List<EventData> events) {
         JSONArray array = new JSONArray();
         for (EventData ed :
                 events) {
             JSONObject object = new JSONObject();
-            object.put("title", ed.getEventName());
-            object.put("id", ed.getId());
-            object.put("start", ed.getDatetime_from().toString());
-            object.put("end", ed.getDatetime_to().toString());
-            object.put("location", ed.getLocation());
-            object.put("description", ed.getMessage());
-            object.put("boardName", ed.getBoard().getName());
-            object.put("display", "list-item");
-            array.add(object);
+            putEventInfo(ed, object);
+            object.put("familyMember", "you");
+            try{
+                array.add(object);
+            } catch (Exception e){
+                logger.error("EventToJsonService\n" + e.getMessage());
+            }
         }
         return array;
     }
+
     private JSONArray SetEventDataToJSONObjectForFamilyMembers(List<EventData> events, UserRole ur) {
         JSONArray array = new JSONArray();
         for (EventData ed :
                 events) {
             JSONObject object = new JSONObject();
-            object.put("title", ed.getEventName());
-            object.put("id", ed.getId());
-            object.put("start", ed.getDatetime_from().toString());
-            object.put("end", ed.getDatetime_to().toString());
-            object.put("location", ed.getLocation());
-            object.put("description", ed.getMessage());
+            putEventInfo(ed, object);
             object.put("familyMember", ur.getUser().getFirstname() + " " + ur.getUser().getLastname());
-            object.put("boardName", ed.getBoard().getName());
-            object.put("display", "list-item");
             object.put("textColor", "red");
-            array.add(object);
+            try{
+                array.add(object);
+            } catch (Exception e){
+                logger.error("EventToJsonService\n" + e.getMessage());
+            }
         }
         return array;
+    }
+
+    private void putEventInfo(EventData ed, JSONObject object) {
+        object.put("title", ed.getEventName());
+        /*object.put("id", ed.getId());*/
+        object.put("start", ed.getDatetime_from().toString());
+        object.put("end", ed.getDatetime_to().toString());
+        object.put("location", ed.getLocation());
+        object.put("description", ed.getMessage());
+        object.put("boardName", ed.getBoard().getName());
+        object.put("display", "list-item");
     }
 
 }
