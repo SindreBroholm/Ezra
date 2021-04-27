@@ -76,13 +76,6 @@ public class AccessController {
         }
     }
 
-    @GetMapping("/")
-    public String getMainPage(Model model, Principal principal) {
-        UserData user = userDataRepository.findByEmail(principal.getName());
-        model.addAttribute("allEvents", eventToJsonService.getAllEventsToUser(user.getId()));
-        model.addAttribute("UserRoles", userRoleRepository.findAllByUserIdAndMembershipTypeIsNot(user.getId(), UserPermission.VISITOR));
-        return "mainPage";
-    }
 
     @GetMapping("/searchForBoard")
     public String getSearchForBoardPage() {

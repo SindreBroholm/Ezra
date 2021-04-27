@@ -36,7 +36,8 @@
 
         /*This is an array of all events connected to user*/
         const eventArray = /*[[${allEvents}]]*/ [];
-
+        const familyEvents = /*[[${familyEvents}]]*/ [];
+        eventArray.push.apply(eventArray, familyEvents);
         const calendarEl = document.getElementById('calendar');
         const rightSection = document.getElementById("rightOfMain")
 

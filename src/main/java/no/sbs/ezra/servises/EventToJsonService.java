@@ -45,21 +45,45 @@ public class EventToJsonService {
                             userRoleRepository.findByBoardIdAndUserId(ur.getBoard().getId(), userDataId).getMembershipType()));
         }
 
+        return SetEventDataToJSONObject(events);
+    }
+
+    public JSONArray getAllEventsToUsersFamilyMembers(List<Integer> familyMembersId){
+        List<EventData> events = new ArrayList<>();
+        List<UserRole> familyUserRoles = new ArrayList<>();
+
+        for (Integer i :
+                familyMembersId) {
+            familyUserRoles.addAll(userRoleRepository.findAllByUserId(i));
+        }
+
+        for (UserRole ur :
+                familyUserRoles) {
+            events.addAll(
+                    permissionService.getAllEventsFromBoardByUserPermission(
+                            boardDataRepository.findById(ur.getBoard().getId()).get(),
+                            userRoleRepository.findByBoardIdAndUserId(ur.getBoard().getId(), ur.getUser().getId()).getMembershipType()));
+        }
+
+        return SetEventDataToJSONObject(events);
+    }
+
+    private JSONArray SetEventDataToJSONObject(List<EventData> events) {
+        JSONArray array = new JSONArray();
         for (EventData ed :
                 events) {
             JSONObject object = new JSONObject();
-                object.put("title", ed.getEventName());
-                object.put("id", ed.getId());
-                object.put("start", ed.getDatetime_from().toString());
-                object.put("end", ed.getDatetime_to().toString());
-                object.put("location", ed.getLocation());
-                object.put("description", ed.getMessage());
-                object.put("boardName", ed.getBoard().getName());
-                object.put("display", "list-item");
-                array.add(object);
+            object.put("title", ed.getEventName());
+            object.put("id", ed.getId());
+            object.put("start", ed.getDatetime_from().toString());
+            object.put("end", ed.getDatetime_to().toString());
+            object.put("location", ed.getLocation());
+            object.put("description", ed.getMessage());
+            object.put("boardName", ed.getBoard().getName());
+            object.put("display", "list-item");
+            array.add(object);
         }
         return array;
     }
-
 
 }

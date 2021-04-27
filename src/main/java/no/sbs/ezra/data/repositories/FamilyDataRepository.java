@@ -16,4 +16,5 @@ public interface FamilyDataRepository extends CrudRepository<FamilyData, Integer
     List<FamilyData> findAllByUserOneIdOrUserTwoIdAndPendingRequest(int userOneId, int userTwoId, boolean pendingRequest);
 
     FamilyData findByFamilyId(String familyId);
+
 }
