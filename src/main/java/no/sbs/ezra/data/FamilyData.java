@@ -37,15 +37,13 @@ public class FamilyData {
     public FamilyData(UserData userOne, UserData userTwo, boolean pendingRequest, boolean areFamily) {
         this.pendingRequest = pendingRequest;
         this.areFamily = areFamily;
+        this.userOne = userOne;
+        this.userTwo = userTwo;
 
         if (userOne.getId() > userTwo.getId()){
             this.familyId = userTwo.getId() + "_" + userOne.getId();
-            this.userOne = userTwo;
-            this.userTwo = userOne;
         } else {
             this.familyId = userOne.getId() + "_" + userTwo.getId();
-            this.userOne = userOne;
-            this.userTwo = userTwo;
         }
     }
 

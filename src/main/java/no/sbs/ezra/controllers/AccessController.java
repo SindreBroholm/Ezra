@@ -7,8 +7,6 @@ import no.sbs.ezra.data.validators.UserDataValidator;
 import no.sbs.ezra.security.PasswordConfig;
 import no.sbs.ezra.security.UserPermission;
 import no.sbs.ezra.servises.EventToJsonService;
-import org.apache.catalina.User;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -16,12 +14,11 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+
 
 
 @Controller
@@ -49,7 +46,7 @@ public class AccessController {
         return "signupPage";
     }
 
-    /*todo: implement resetpassword !*/
+    /*todo: implement resetPassword !*/
 
 
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
@@ -69,7 +66,7 @@ public class AccessController {
                 FamilyRequest haveJoined = familyRequestRepository.findByMemberEmail(userData.getEmail()).get();
                 haveJoined.setHaveJoined(true);
                 familyRequestRepository.save(haveJoined);
-                UserData sender = userDataRepository.findByEmail(haveJoined.getMemberEmail());
+                UserData sender = userDataRepository.findById(haveJoined.getUser().getId()).get();
                 familyDataRepository.save(new FamilyData(sender, userData, true, false));
             }
 

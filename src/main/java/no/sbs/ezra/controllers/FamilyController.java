@@ -37,10 +37,6 @@ public class FamilyController {
         return "familyPage";
     }
 
-    /*
-    * find pending request og retuner userdata i setde for å prøve å finne riktig bruker.
-    * kså sender vi userdata id til postmapping istedet, for den håndterer familiId.
-    * */
     private List<UserData> getPendingFamilyRequests(UserData user){
         List<FamilyData> pending = familyDataRepository.findAllByUserOneIdOrUserTwoIdAndPendingRequest(user.getId(), user.getId(), true);
         List<Integer> list = getPendingFamilyMembersId(user, pending);
@@ -48,7 +44,7 @@ public class FamilyController {
         for (Integer i :
                 list) {
             if (userDataRepository.findById(i).isPresent()){
-                if (familyRequestRepository.findByUserId(i).isPresent()){
+                if (familyRequestRepository.findByUserIdAndMemberEmail(i, user.getEmail()).isPresent()){
                     temp.add(userDataRepository.findById(i).get());
                 }
             }
@@ -120,6 +116,7 @@ public class FamilyController {
             UserData sender = userDataRepository.findByEmail(principal.getName());
             if (userDataRepository.findByEmail(sendTo) != null){
                 UserData isAlreadyUser = userDataRepository.findByEmail(sendTo);
+                familyRequestRepository.save(new FamilyRequest(sender, sendTo, true));
                 familyDataRepository.save(new FamilyData(sender, isAlreadyUser, true, false));
             } else {
                 emailService.sendFamilyMemberRequest(sendTo, principal);
