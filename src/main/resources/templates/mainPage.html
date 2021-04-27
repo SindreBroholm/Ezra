@@ -101,6 +101,12 @@
                                 <span class="eventInfoInput">${event.extendedProps.description}</span>
                             </div>
                         </div>
+                        <div class="eventVariableInfoBox div">
+                            <div class="variableField div">
+                                <span class="infoField">Attending</span>
+                                <span class="eventInfoInput">${event.extendedProps.familyMember}</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -136,6 +142,11 @@
                                 <span class="eventInfoInput">${sliceStartDate}</span>
                                 <span class="infoField">-</span>
                                 <span class="eventInfoInput">${sliceEndDate}</span>
+                                <div>
+                                <br>
+                                <span class="infoField">Attending</span><br>
+                                <span class="eventInfoInput">${event.familyMember}</span>
+                                </div>
                             </div>
 
                             </div>
@@ -164,6 +175,7 @@
                     let getDate = value.start
                     let sliceDate = getDate.slice(0, 10)
                     if (sliceDate === info.dateStr){
+                        console.log(value);
                         eventsThisDay.push(value);
                         tempHTML += showEvents(value);
                     }
@@ -180,7 +192,7 @@
                 hour12: false
             },
             events: eventArray,
-            eventColor: '#1D9F91'
+            /*eventColor: '#1D9F91'*/
         });
         calendar.render();
     });

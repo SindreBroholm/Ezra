@@ -56,16 +56,18 @@ public class EventToJsonService {
                 familyMembersId) {
             familyUserRoles.addAll(userRoleRepository.findAllByUserId(i));
         }
-
+        JSONArray array = new JSONArray();
         for (UserRole ur :
                 familyUserRoles) {
             events.addAll(
                     permissionService.getAllEventsFromBoardByUserPermission(
                             boardDataRepository.findById(ur.getBoard().getId()).get(),
                             userRoleRepository.findByBoardIdAndUserId(ur.getBoard().getId(), ur.getUser().getId()).getMembershipType()));
+            array.addAll(SetEventDataToJSONObjectForFamilyMembers(events, ur));
+
         }
 
-        return SetEventDataToJSONObject(events);
+        return array;
     }
 
     private JSONArray SetEventDataToJSONObject(List<EventData> events) {
@@ -81,6 +83,25 @@ public class EventToJsonService {
             object.put("description", ed.getMessage());
             object.put("boardName", ed.getBoard().getName());
             object.put("display", "list-item");
+            array.add(object);
+        }
+        return array;
+    }
+    private JSONArray SetEventDataToJSONObjectForFamilyMembers(List<EventData> events, UserRole ur) {
+        JSONArray array = new JSONArray();
+        for (EventData ed :
+                events) {
+            JSONObject object = new JSONObject();
+            object.put("title", ed.getEventName());
+            object.put("id", ed.getId());
+            object.put("start", ed.getDatetime_from().toString());
+            object.put("end", ed.getDatetime_to().toString());
+            object.put("location", ed.getLocation());
+            object.put("description", ed.getMessage());
+            object.put("familyMember", ur.getUser().getFirstname() + " " + ur.getUser().getLastname());
+            object.put("boardName", ed.getBoard().getName());
+            object.put("display", "list-item");
+            object.put("textColor", "red");
             array.add(object);
         }
         return array;
