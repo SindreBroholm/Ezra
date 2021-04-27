@@ -1,7 +1,6 @@
 package no.sbs.ezra.data;
 
 import lombok.Data;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import javax.persistence.*;
@@ -11,32 +10,43 @@ import javax.persistence.*;
 @RequiredArgsConstructor
 public class FamilyData {
 
+
+
+    @JoinColumn(name = "user_one", referencedColumnName = "id")
+    @ManyToOne(targetEntity = UserData.class)
+    private UserData userOne;
+
+
+    @JoinColumn(name = "user_two", referencedColumnName = "id")
+    @ManyToOne(targetEntity = UserData.class)
+    private UserData userTwo;
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-
-    @ManyToOne
-    private UserData user;
-
-    @ManyToOne
-    private UserData member;
+    private String familyId;
 
     private boolean pendingRequest;
 
-    @NonNull
-    private Integer familyId;
+    private boolean areFamily;
 
 
-    public FamilyData(UserData user, UserData member,
-                      boolean pendingRequest,
-                      @NonNull Integer familyId) {
-        this.user = user;
-        this.member = member;
+    /*
+    * The user with the lowest ID will be set to userOne
+    * the familyId will be set to "userOneId_userTwoId" = "1_2" <-- example.
+    * Always get familyData based on familyId
+    * */
+    public FamilyData(UserData userOne, UserData userTwo, boolean pendingRequest, boolean areFamily) {
         this.pendingRequest = pendingRequest;
-        this.familyId = familyId;
+        this.areFamily = areFamily;
+
+        if (userOne.getId() > userTwo.getId()){
+            this.familyId = userTwo.getId() + "_" + userOne.getId();
+            this.userOne = userTwo;
+            this.userTwo = userOne;
+        } else {
+            this.familyId = userOne.getId() + "_" + userTwo.getId();
+            this.userOne = userOne;
+            this.userTwo = userTwo;
+        }
     }
 
-    public FamilyData() {
-
-    }
 }

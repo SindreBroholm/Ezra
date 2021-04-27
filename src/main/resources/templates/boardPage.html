@@ -85,13 +85,23 @@
                 </form>
             </div>
         </div>
+        <div th:if="${!userPermission.membershipType.getPermission().equals('visitor')}" class="pa30">
+            <div>
+                <form th:action="@{'/board/' + *{id}+ '/sendInvite'}" method="post">
+                    <input type="text" name="sendTo" placeholder="ola.nordmann@mail.no">
+                    <button class="link" type="submit">Invite</button>
+                </form>
+            </div>
+        </div>
     </section>
 
     <!--posts-->
     <section class="main">
         <div id="ShowEventInfo" th:if="${!userPermission.getMembershipType().getPermission().equals('visitor')}"></div>
         <div th:if="${userPermission.getMembershipType().getPermission().equals('visitor')}">
-            Hi there
+            <div>
+                <p th:text="${board.description}"></p>
+            </div>
         </div>
 
     </section>

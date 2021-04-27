@@ -75,14 +75,28 @@ create table ezra.notification
     foreign key (Membership_Type) references membership (Type) ON DELETE CASCADE
 );
 
-create table ezra.family
+create table ezra.family_data
 (
-    Id              int auto_increment unique not null,
-    User_Id         int                       not null,
-    Member_Id       int                       not null,
-    Pending_Request boolean,
-    Family_ID       int                       not null,
-    primary key (Id),
-    foreign key (User_Id) references user_data (Id) ON DELETE CASCADE,
-    foreign key (Member_Id) references user_data (Id) ON DELETE CASCADE
+    family_id       varchar(50) unique not null,
+    user_one     int                not null,
+    user_two     int                not null,
+    pending_request boolean            not null,
+    are_family      boolean            not null,
+    primary key (family_id),
+    foreign key (user_one) references user_data (Id) ON DELETE CASCADE,
+    foreign key (user_two) references user_data (Id) ON DELETE CASCADE
 );
+
+create table ezra.family_request
+(
+    id           int auto_increment unique,
+    User_Id      int          not null,
+    member_Email varchar(360) not null,
+    have_Joined  boolean,
+    primary key (id),
+    foreign key (User_id) references user_data (id) ON DELETE CASCADE
+);
+drop table ezra.family_request;
+
+
+drop table ezra.family_data;

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="author" content="Sindre Broholm Sæther">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link th:href="@{/css/headerFragment.css}" rel="stylesheet"/>
+  <link th:href="@{/css/boardMembersPage.css}" rel="stylesheet"/>
+  <link th:href="@{/css/globalElements.css}" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+        rel="stylesheet">
+  <title>Ezra</title>
+</head>
+<body>
+<header th:replace="fragments/headerFragment :: header"></header>
+
+<main id="main-grid-container">
+  <!--info-->
+  <section class="leftOfMain" >
+    <form th:action="@{/familyMember}" method="post">
+      <input type="text" name="sendTo">
+      <button class="link" type="submit">Send request</button>
+    </form>
+  </section>
+
+  <!--pending request-->
+  <section class="main">
+    <h2>Awaiting your response</h2>
+    <div th:if="${famPendingRequest.size() > 0}" class="gridContainer">
+      <div th:each="pending: ${famPendingRequest}" th:object="${pending}" class="borderBox">
+        <div>
+          <span th:text="*{firstname + ' ' + lastname}" class="infoInput"></span>
+          <span th:text="*{email}" class="infoInput"></span>
+          <span th:text="*{phone_number}" class="infoInput"></span>
+        </div>
+
+        <div class="pendingMemberFormBox">
+          <form th:action="@{'/family/' + ${pending.id}}" method="post" class="pendingMemberForm">
+            <input type="text" name="value" th:value="${true}" hidden>
+            <button class="link" type="submit">Accept</button>
+          </form>
+          <form th:action="@{'/family/' + ${pending.id}}" method="post" class="pendingMemberForm">
+            <input type="text" name="value" th:value="${false}" hidden>
+            <button class="delete link" type="submit">Reject</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!--members-->
+  <section class="rightOfMain">
+    <h2>Members</h2>
+    <div class="membersGridContainer">
+      <div th:each="member: ${myFamily}" th:object="${member}" class="borderBox" th:id="${memberStat.count}" onclick="toggle(this.id)"
+      th:if="${member.getUserOne.id == user.id}">
+        <div>
+          <span th:text="*{getUserTwo.firstname + ' ' + getUserTwo.lastname}" class="infoInput"></span>
+          <span th:text="*{getUserTwo.email}" class="infoInput"></span>
+          <span th:text="*{getUserTwo.phone_number}" class="infoInput"></span>
+        </div>
+        <div class="toggleBox" style="display: none;">
+          <form th:action="@{'/family/' + ${member.getUserTwo.id}}" method="post" class="pendingMemberForm">
+            <input type="text" name="value" th:value="${false}" hidden>
+            <button class="link" type="submit">Delete</button>
+          </form>
+        </div>
+      </div>
+      <div th:each="member: ${myFamily}" th:object="${member}" class="borderBox" th:id="${memberStat.count}" onclick="toggle(this.id)"
+           th:if="${member.getUserTwo.id == user.id}">
+        <div>
+          <span th:text="*{getUserOne.firstname + ' ' + getUserOne.lastname}" class="infoInput"></span>
+          <span th:text="*{getUserOne.email}" class="infoInput"></span>
+          <span th:text="*{getUserOne.phone_number}" class="infoInput"></span>
+        </div>
+        <div class="toggleBox" style="display: none;">
+          <form th:action="@{'/family/' + ${member.getUserOne.id}}" method="post" class="pendingMemberForm">
+            <input type="text" name="value" th:value="${false}" hidden>
+            <button class="link" type="submit">Delete</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  function toggle(id) {
+    let divNode = document.getElementById(id);
+    let formNode = divNode.lastElementChild;
+
+    if (formNode.style.display === 'none') {
+      formNode.style.display = 'block';
+    } else {
+      /* formNode.style.display = 'none';*/
+    }
+  }
+</script>
+</body>
+</html>

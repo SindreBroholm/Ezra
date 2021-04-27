@@ -1,5 +1,6 @@
 package no.sbs.ezra.controllers;
 
+import lombok.AllArgsConstructor;
 import no.sbs.ezra.data.BoardData;
 import no.sbs.ezra.data.EventData;
 import no.sbs.ezra.data.UserData;
@@ -11,6 +12,7 @@ import no.sbs.ezra.data.repositories.UserRoleRepository;
 import no.sbs.ezra.data.validators.BoardDataValidator;
 import no.sbs.ezra.data.validators.EventDataValidator;
 import no.sbs.ezra.security.UserPermission;
+import no.sbs.ezra.servises.EmailService;
 import no.sbs.ezra.servises.PermissionService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,8 +24,11 @@ import javax.validation.Valid;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import static no.sbs.ezra.constants.Constants.*;
+
 
 @Controller
+@AllArgsConstructor
 public class BoardController {
 
     private final UserDataRepository userDataRepository;
@@ -31,17 +36,8 @@ public class BoardController {
     private final UserRoleRepository userRoleRepository;
     private final EventDataRepository eventDataRepository;
     private final PermissionService permissionService;
+    private final EmailService emailService;
 
-
-    public BoardController(UserDataRepository userDataRepository, BoardDataRepository boardDataRepository,
-                           UserRoleRepository userRoleRepository, EventDataRepository eventDataRepository,
-                           PermissionService permissionService) {
-        this.userDataRepository = userDataRepository;
-        this.boardDataRepository = boardDataRepository;
-        this.userRoleRepository = userRoleRepository;
-        this.eventDataRepository = eventDataRepository;
-        this.permissionService = permissionService;
-    }
 
     @GetMapping("/board/{boardId}")
     public String getBoardPage(Model model, @PathVariable Integer boardId, Principal principal) {
@@ -56,7 +52,7 @@ public class BoardController {
             model.addAttribute("board", board);
             return "boardPage";
         }
-        return "redirect:/";
+        return HOME_PAGE;
     }
 
     @GetMapping(value = {"/createEvent/{boardId}", "/createEvent/{boardId}/{eventId}"})
@@ -72,7 +68,7 @@ public class BoardController {
                 return "createOrEditEventPage";
             }
         }
-        return "redirect:/";
+        return HOME_PAGE;
     }
 
     @GetMapping("/board/{boardId}/members")
@@ -85,11 +81,11 @@ public class BoardController {
                 model.addAttribute("members", userRoleRepository.findAllByBoardIdAndMembershipTypeOrMembershipType(board.getId(), UserPermission.MEMBER, UserPermission.ADMIN));
                 model.addAttribute("pendingMembers", userRoleRepository.findAllByBoardIdAndMembershipTypeAndPendingMember(board.getId(), UserPermission.FOLLOWER, true));
                 model.addAttribute("board", board);
-                model.addAttribute("permissions", userPermissionsInteraction());
+                model.addAttribute("permissions", userPermissionsInteraction(role.getMembershipType()));
                 return "boardMembersPage";
             }
         }
-        return "redirect:/";
+        return HOME_PAGE;
     }
 
     @GetMapping("/board/{boardId}/edit")
@@ -104,7 +100,7 @@ public class BoardController {
                 return "editBoardPage";
             }
         }
-        return "redirect:/";
+        return HOME_PAGE;
     }
 
     @GetMapping("/createBoard")
@@ -113,6 +109,17 @@ public class BoardController {
         model.addAttribute("BoardData", new BoardData());
         model.addAttribute("errors", new ArrayList<>());
         return "createNewBoardPage";
+    }
+
+    @RequestMapping(value = "/board/{boardId}/sendInvite")
+    public String sendInviteByMail(@PathVariable Integer boardId, @RequestParam String sendTo, Principal principal){
+        if (boardDataRepository.findById(boardId).isPresent()){
+            BoardData board = boardDataRepository.findById(boardId).get();
+            if (sendTo.matches("^(.+)@(.+)$")){
+                emailService.sendEmailInviteToBoard(sendTo, principal, board);
+            }
+        }
+        return "redirect:/board/" + boardId;
     }
 
     @RequestMapping(value = "/createBoard", method = RequestMethod.POST)
@@ -130,7 +137,7 @@ public class BoardController {
                 userRoleRepository.save(new UserRole(userDataRepository.findByEmail(principal.getName()), boardData, UserPermission.MASTER, false));
             }
         }
-        return "redirect:/";
+        return HOME_PAGE;
     }
 
     @RequestMapping(value = "/board/{boardId}/edit", method = RequestMethod.POST)
@@ -157,19 +164,7 @@ public class BoardController {
                 }
             }
         }
-        return "redirect:/";
-    }
-
-    private void updateBoardInformation(Integer boardId, BoardData boardData) {
-        if (boardDataRepository.findById(boardId).isPresent()){
-            BoardData update = boardDataRepository.findById(boardId).get();
-            update.setContactEmail(boardData.getContactEmail());
-            update.setContactNumber(boardData.getContactNumber());
-            update.setContactName(boardData.getContactName());
-            update.setHomepage(boardData.getHomepage());
-            update.setName(boardData.getName());
-            boardDataRepository.save(update);
-        }
+        return HOME_PAGE;
     }
 
     @RequestMapping(value = "/board/{boardId}/members/{memberId}", method = RequestMethod.POST)
@@ -184,7 +179,7 @@ public class BoardController {
                 updateBoardMemberPermission(boardId, value, loggedInUser, memberUr);
             }
         }
-        return "redirect:/";
+        return HOME_PAGE;
     }
 
 
@@ -207,12 +202,12 @@ public class BoardController {
                         return "createOrEditEventPage";
                     } else {
                         saveOrUpdateEvent(eventData, eventId);
-                        return "redirect:/";
+                        return HOME_PAGE;
                     }
                 }
             }
         }
-        return "redirect:/";
+        return HOME_PAGE;
     }
 
     @RequestMapping(value = "/deleteEvent/{boardId}/{eventId}", method = RequestMethod.POST)
@@ -228,7 +223,7 @@ public class BoardController {
                 }
             }
         }
-        return "redirect:/";
+        return HOME_PAGE;
     }
 
     @RequestMapping(value = "/board/{boardId}/access", method = RequestMethod.POST)
@@ -256,6 +251,9 @@ public class BoardController {
     }
 
 
+    /*
+    * This method let user follow, request membership and withdraw request to a board
+    * */
     private void handleMembershipRequest(UserRole role) {
         switch (role.getMembershipType().getPermission()) {
             case "follower" -> role.setPendingMember(!role.isPendingMember());
@@ -264,6 +262,10 @@ public class BoardController {
         userRoleRepository.save(role);
     }
 
+    /*
+    * This method let a Admin/Master handle members permission.
+    * Setting a member to FOLLOWER is the same as kicking them out.
+    *  */
     private void updateBoardMemberPermission(Integer boardId, String value, UserData loggedInUser, UserRole memberUr) {
         switch (value) {
             case "ADMIN", "MEMBER" -> {
@@ -283,10 +285,27 @@ public class BoardController {
         userRoleRepository.save(memberUr);
     }
 
+    /*
+    * Every user needs to have a UserRole on a board,
+    * this sets user to visitor if no UserRole is found.
+    * */
     private void handleFirstTimeVisitor(BoardData board, UserData user) {
         if (userRoleRepository.findByBoardIdAndUserId(board.getId(), user.getId()) == null) {
             userRoleRepository.save(new UserRole(user, board, UserPermission.VISITOR, false));
         }
+    }
+
+    /*
+    * provides a list of UserPermissions based on the users UserRole for handleBoardMembersPermission()
+    *  */
+    public List<UserPermission> userPermissionsInteraction(UserPermission permission) {
+        List<UserPermission> temp = new ArrayList<>();
+        if (permission.getPermission().equals("master")){
+            temp.add(UserPermission.ADMIN);
+        }
+        temp.add(UserPermission.MEMBER);
+        temp.add(UserPermission.FOLLOWER);
+        return temp;
     }
 
     private void saveOrUpdateEvent(EventData event, Integer eventId) {
@@ -304,7 +323,17 @@ public class BoardController {
             eventDataRepository.save(event);
         }
     }
-
+    private void updateBoardInformation(Integer boardId, BoardData boardData) {
+        if (boardDataRepository.findById(boardId).isPresent()){
+            BoardData update = boardDataRepository.findById(boardId).get();
+            update.setContactEmail(boardData.getContactEmail());
+            update.setContactNumber(boardData.getContactNumber());
+            update.setContactName(boardData.getContactName());
+            update.setHomepage(boardData.getHomepage());
+            update.setName(boardData.getName());
+            boardDataRepository.save(update);
+        }
+    }
     private EventData getNewOrExistingEvent(Integer eventId) {
         EventData event;
         if (eventId != null) {
@@ -319,7 +348,6 @@ public class BoardController {
         }
         return event;
     }
-
     private List<String> getErrorMessages(BindingResult br) {
         List<ObjectError> allErrors = br.getAllErrors();
         List<String> errors = new ArrayList<>();
@@ -328,13 +356,5 @@ public class BoardController {
             errors.add(e.getDefaultMessage());
         }
         return errors;
-    }
-
-    public List<UserPermission> userPermissionsInteraction() {
-        List<UserPermission> temp = new ArrayList<>();
-        temp.add(UserPermission.MEMBER);
-        temp.add(UserPermission.FOLLOWER);
-        temp.add(UserPermission.ADMIN);
-        return temp;
     }
 }
