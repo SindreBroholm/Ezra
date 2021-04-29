@@ -96,6 +96,3 @@ create table ezra.family_request
     primary key (id),
     foreign key (User_id) references user_data (id) ON DELETE CASCADE
 );
-
-
-select * from family_request fr where User_Id = 3;

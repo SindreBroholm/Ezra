@@ -36,7 +36,6 @@
 #main-grid-container {
     display: grid;
     grid-template-columns: 0.5fr 1fr 0.5fr;
-    /* grid-template-rows: 1.8fr 0.2fr; */
     gap: 50px 0px;
     grid-template-areas:
         "leftbox main ."
@@ -96,5 +95,14 @@
 }
 .memberForm {
     width: 100%;
+    padding: 20px;
+}
+
+#sendInviteBox{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+#inviteBox{
     padding: 20px;
 }

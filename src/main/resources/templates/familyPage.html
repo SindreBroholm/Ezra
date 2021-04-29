@@ -18,10 +18,14 @@
 <main id="main-grid-container">
   <!--info-->
   <section class="leftOfMain" >
-    <form th:action="@{/familyMember}" method="post">
-      <input type="text" name="sendTo">
-      <button class="link" type="submit">Send request</button>
-    </form>
+    <div id="sendInviteBox">
+      <div id="inviteBox">
+        <form th:action="@{/familyMember}" method="post">
+          <input type="text" name="sendTo" class="inputStyle" placeholder="Invite your family members here">
+          <button class="link" type="submit">Send request</button>
+        </form>
+      </div>
+    </div>
   </section>
 
   <!--pending request-->
