@@ -48,8 +48,10 @@ public class BoardController {
 
             handleFirstTimeVisitor(board, user);
             model.addAttribute("userPermission", userRoleRepository.findByBoardIdAndUserId(boardId, user.getId()));
-            model.addAttribute("events", permissionService.getAllEventsFromBoardByUserPermission(board, userRole.getMembershipType()));
             model.addAttribute("board", board);
+            try {
+                model.addAttribute("events", permissionService.getAllEventsFromBoardByUserPermission(board, userRole.getMembershipType()));
+            } catch (NullPointerException ignore){};
             return "boardPage";
         }
         return HOME_PAGE;

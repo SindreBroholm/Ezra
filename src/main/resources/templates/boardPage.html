@@ -100,6 +100,7 @@
         <div id="ShowEventInfo" th:if="${!userPermission.getMembershipType().getPermission().equals('visitor')}"></div>
         <div th:if="${userPermission.getMembershipType().getPermission().equals('visitor')}">
             <div>
+                <h2>Description</h2>
                 <p th:text="${board.description}"></p>
             </div>
         </div>
@@ -112,7 +113,7 @@
             <div>
                 <h2>Upcoming events</h2>
             </div>
-            <div th:each="event : ${events}" th:object="${event}">
+            <div th:each="event : ${events}" th:object="${event}" th:if="${!events.isEmpty()}">
                 <div>
                     <div class="eventVariableInfoBox">
                         <div class="variableField xex" th:id="${eventStat.count}" onclick="showEvent(this.id)">

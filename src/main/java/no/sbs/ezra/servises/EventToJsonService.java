@@ -39,16 +39,19 @@ public class EventToJsonService {
         List<UserRole> listOfBoards = userRoleRepository.findAllByUserId(userDataId);
         List<EventData> events = new ArrayList<>();
         JSONArray array = new JSONArray();
-
         for (UserRole ur :
                 listOfBoards) {
+            try{
             events.addAll(
                     permissionService.getAllEventsFromBoardByUserPermission(
                             boardDataRepository.findById(ur.getBoard().getId()).get(),
                             userRoleRepository.findByBoardIdAndUserId(ur.getBoard().getId(), userDataId).getMembershipType()));
-        }
 
-        return SetEventDataToJSONObject(events);
+                array.addAll(setEventDataToJSONObject(events));
+            } catch (Exception Ignore){
+            }
+        }
+        return array;
     }
 
     public JSONArray getAllEventsToUsersFamilyMembers(List<Integer> familyMembersId){
@@ -62,24 +65,22 @@ public class EventToJsonService {
         JSONArray array = new JSONArray();
         for (UserRole ur :
                 familyUserRoles) {
+            try{
             events.addAll(
                     permissionService.getAllEventsFromBoardByUserPermission(
                             boardDataRepository.findById(ur.getBoard().getId()).get(),
                             userRoleRepository.findByBoardIdAndUserId(ur.getBoard().getId(), ur.getUser().getId()).getMembershipType()));
-            try{
+
                 array.addAll(SetEventDataToJSONObjectForFamilyMembers(events, ur));
-            } catch (Exception e) {
-                logger.error(e.getMessage());
+            } catch (Exception Ignore) {
             }
-
         }
-
         return array;
     }
 
 
 
-    private JSONArray SetEventDataToJSONObject(List<EventData> events) {
+    private JSONArray setEventDataToJSONObject(List<EventData> events) {
         JSONArray array = new JSONArray();
         for (EventData ed :
                 events) {
@@ -88,8 +89,7 @@ public class EventToJsonService {
             object.put("familyMember", "you");
             try{
                 array.add(object);
-            } catch (Exception e){
-                logger.error("EventToJsonService\n" + e.getMessage());
+            } catch (Exception Ignore){
             }
         }
         return array;

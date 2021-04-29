@@ -34,12 +34,16 @@ public class PermissionService {
             case "visitor":
                 events.addAll(eventDataRepository.findAllByBoardIdAndAndMembershipType(board.getId(), UserPermission.VISITOR));
         }
-        events.removeIf(e -> e.getDatetime_to().isBefore(LocalDateTime.now()));
-        events.sort(
-                Comparator.comparing(EventData::getDatetime_from)
-                .thenComparing(EventData::getDatetime_to)
-        );
-        return events;
+        if (events.isEmpty()){
+            return null;
+        }else {
+            events.removeIf(e -> e.getDatetime_to().isBefore(LocalDateTime.now()));
+            events.sort(
+                    Comparator.comparing(EventData::getDatetime_from)
+                            .thenComparing(EventData::getDatetime_to)
+            );
+            return events;
+        }
     }
 
     public boolean doesUserHaveAdminRights(UserPermission permission) {

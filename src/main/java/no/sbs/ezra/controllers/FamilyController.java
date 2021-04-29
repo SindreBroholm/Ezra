@@ -33,7 +33,9 @@ public class FamilyController {
     @GetMapping("/")
     public String getMainPage(Model model, Principal principal) {
         UserData user = userDataRepository.findByEmail(principal.getName());
+
         model.addAttribute("allEvents", eventToJsonService.getAllEventsToUser(user.getId()));
+
 
         List<FamilyData> famMembers = familyDataRepository.findAllByUserOneIdOrUserTwoIdAndAreFamily(user.getId(), user.getId(), true);
         List<Integer> famMembersId = getPendingFamilyMembersId(user, famMembers);
