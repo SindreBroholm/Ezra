@@ -19,6 +19,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 import java.security.Principal;
@@ -144,7 +145,8 @@ public class BoardController {
 
     @RequestMapping(value = "/board/{boardId}/edit", method = RequestMethod.POST)
     public String editOrDeleteBoard(@PathVariable Integer boardId, @RequestParam(name = "value", required = false) String value,
-                                    @ModelAttribute("BoardData") BoardData boardData, BindingResult br, Model model) {
+                                    @ModelAttribute("BoardData") BoardData boardData, BindingResult br, Model model,
+                                    RedirectAttributes redirectAttributes) {
         if (boardDataRepository.findById(boardId).isPresent()) {
             BoardDataValidator validator = new BoardDataValidator();
             if (validator.supports(boardData.getClass())) {
@@ -158,6 +160,8 @@ public class BoardController {
                     if (value.length() == 6) {
                         if (value.equals("DELETE")) {
                             boardDataRepository.delete(boardDataRepository.findById(boardId).get());
+                            redirectAttributes.addFlashAttribute("message","Board successfully deleted!");
+                            return HOME_PAGE;
                         }
                     } else {
                         updateBoardInformation(boardId, boardData);
@@ -179,6 +183,7 @@ public class BoardController {
                 UserData member = userDataRepository.findById(memberId).get();
                 UserRole memberUr = userRoleRepository.findByBoardIdAndUserId(board.getId(), member.getId());
                 updateBoardMemberPermission(boardId, value, loggedInUser, memberUr);
+                return "redirect:/board/"+ boardId + "/members";
             }
         }
         return HOME_PAGE;

@@ -59,49 +59,56 @@
                 </div>
             </div>
         </div>
-        <div th:switch="${userPermission.getMembershipType().getPermission()}">
-            <div th:case="'visitor'" class="pa30">
+        <div id="applyForMembershipBox">
+            <div th:switch="${userPermission.getMembershipType().getPermission()}">
+                <div th:case="'visitor'" class="pa30">
+                    <form th:action="@{'/board/' + *{id}+ '/access'}" method="post">
+                        <button class="link" type="submit">Follow</button>
+                    </form>
+                </div>
+                <div th:case="'follower'" class="pa30">
+                    <div th:if="${!userPermission.pendingMember}">
+                        <form th:action="@{'/board/' + *{id}+ '/access'}" method="post">
+                            <button class="link" type="submit">Apply membership</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div th:if="${userPermission.pendingMember}" class="pa30">
                 <form th:action="@{'/board/' + *{id}+ '/access'}" method="post">
-                    <button class="link" type="submit">Follow</button>
+                    <button class="delete link" type="submit">withdraw request</button>
                 </form>
             </div>
-            <div th:case="'follower'" class="pa30">
-                <div th:if="${!userPermission.pendingMember}">
-                    <form th:action="@{'/board/' + *{id}+ '/access'}" method="post">
-                        <button class="link" type="submit">Apply membership</button>
+            <div th:if="${!userPermission.membershipType.getPermission().equals('visitor')}" class="pa30">
+                <div th:if="${!userPermission.membershipType.getPermission().equals('master')}">
+                    <form th:action="@{'/board/' + *{id}+ '/unfollow'}" method="post">
+                        <button class="delete link" type="submit">Unfollow board</button>
+                    </form>
+                </div>
+            </div>
+            <div th:if="${!userPermission.membershipType.getPermission().equals('visitor')}" class="pa30">
+                <div>
+                    <form th:action="@{'/board/' + *{id}+ '/sendInvite'}" method="post">
+                        <input type="text" name="sendTo" placeholder="ola.nordmann@mail.no" class="inputStyle">
+                        <button class="link" type="submit">Invite</button>
                     </form>
                 </div>
             </div>
         </div>
-        <div th:if="${userPermission.pendingMember}" class="pa30">
-            <form th:action="@{'/board/' + *{id}+ '/access'}" method="post">
-                <button class="delete link" type="submit">withdraw request</button>
-            </form>
-        </div>
-        <div th:if="${!userPermission.membershipType.getPermission().equals('visitor')}" class="pa30">
-            <div th:if="${!userPermission.membershipType.getPermission().equals('master')}">
-                <form th:action="@{'/board/' + *{id}+ '/unfollow'}" method="post">
-                    <button class="delete link" type="submit">Unfollow board</button>
-                </form>
-            </div>
-        </div>
-        <div th:if="${!userPermission.membershipType.getPermission().equals('visitor')}" class="pa30">
-            <div>
-                <form th:action="@{'/board/' + *{id}+ '/sendInvite'}" method="post">
-                    <input type="text" name="sendTo" placeholder="ola.nordmann@mail.no">
-                    <button class="link" type="submit">Invite</button>
-                </form>
-            </div>
-        </div>
+
     </section>
 
-    <!--posts-->
+    <!--center-->
     <section class="main">
         <div id="ShowEventInfo" th:if="${!userPermission.getMembershipType().getPermission().equals('visitor')}"></div>
-        <div th:if="${userPermission.getMembershipType().getPermission().equals('visitor')}">
-            <div>
-                <h2>Description</h2>
-                <p th:text="${board.description}"></p>
+        <div th:if="${userPermission.getMembershipType().getPermission().equals('visitor')}" id="eventSection">
+            <div id="eventBox">
+                <div id="eventInfoElements">
+                    <h2>Description</h2>
+                </div>
+                <div class="variableField">
+                    <p th:text="${board.description}" class="eventInfoInput brbrbr"></p>
+                </div>
             </div>
         </div>
 
@@ -140,7 +147,7 @@
 
     <!--footer-->
     <footer th:if="${userPermission.membershipType.getPermission().equals('master')}" class="footerContainer">
-        <div>
+        <div id="footerLinkBox">
             <a th:href="@{'/board/' + ${board.id} + '/edit' }" class="link">Edit board</a>
         </div>
 

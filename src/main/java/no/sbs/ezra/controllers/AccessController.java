@@ -92,7 +92,7 @@ public class AccessController {
             searchResults = (List<BoardData>) boardDataRepository.findAll();
         }
         if (searchResults.size() == 0) {
-            searchResults.add(new BoardData("noResult", "noName", "00000000", "noEmail@no.no", "noPage"));
+            searchResults.add(new BoardData("noResult", "noName", "00000000", "noEmail@no.no", "noPage", "noDescription"));
         }
         return searchResults;
     }

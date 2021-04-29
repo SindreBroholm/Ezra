@@ -37,11 +37,13 @@ public class BoardData {
 
     public BoardData(@NonNull String name, @NonNull String contactName,
                      String contactNumber, @NonNull String contactEmail,
-                     String homepage) {
+                     String homepage, String description) {
         this.name = name;
         this.contactName = contactName;
         this.contactNumber = contactNumber;
         this.contactEmail = contactEmail;
         this.homepage = homepage;
+        this.description = description;
     }
+
 }

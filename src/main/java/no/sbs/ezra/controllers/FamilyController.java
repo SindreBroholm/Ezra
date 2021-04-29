@@ -14,6 +14,7 @@ import no.sbs.ezra.servises.EventToJsonService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 import java.util.ArrayList;
@@ -31,17 +32,15 @@ public class FamilyController {
     private final UserRoleRepository userRoleRepository;
 
     @GetMapping("/")
-    public String getMainPage(Model model, Principal principal) {
+    public String getMainPage(Model model, Principal principal, @ModelAttribute("message") String msg) {
         UserData user = userDataRepository.findByEmail(principal.getName());
-
-        model.addAttribute("allEvents", eventToJsonService.getAllEventsToUser(user.getId()));
-
-
         List<FamilyData> famMembers = familyDataRepository.findAllByUserOneIdOrUserTwoIdAndAreFamily(user.getId(), user.getId(), true);
         List<Integer> famMembersId = getPendingFamilyMembersId(user, famMembers);
         eventToJsonService.getAllEventsToUsersFamilyMembers(famMembersId);
+        model.addAttribute("allEvents", eventToJsonService.getAllEventsToUser(user.getId()));
         model.addAttribute("familyEvents", eventToJsonService.getAllEventsToUsersFamilyMembers(famMembersId));
         model.addAttribute("UserRoles", userRoleRepository.findAllByUserIdAndMembershipTypeIsNot(user.getId(), UserPermission.VISITOR));
+        model.addAttribute("msg", msg);
         return "mainPage";
     }
 

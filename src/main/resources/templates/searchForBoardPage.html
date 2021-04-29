@@ -16,7 +16,7 @@
         <div class="innerSearchDiv">
             <form th:action="@{/searchForBoard}" method="post" class="searchForm">
                 <label for="keyword"></label>
-                <input type="text" name="keyword" id="keyword" th:value="${keyword}" placeholder="Search for board"/>
+                <input type="text" name="keyword" id="keyword" th:value="${keyword}" class="inputStyle" placeholder="Search for board"/>
                 <button type="submit">Search</button>
             </form>
         </div>

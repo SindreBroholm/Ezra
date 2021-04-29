@@ -63,9 +63,9 @@
             </div>
             <div class="InputBox">
               <div class="InputField">
-                <label class="label">
-                  <span class="span">Permanent delete?</span>
-                  <input type="text" class="input" name="value" placeholder="type: |DELETE| to confirm">
+                <label id="textLabel1" class="label">
+                  <span class="span">Description</span>
+                  <textarea id="textArea" class="input" th:field="*{description}" th:errorclass="filderror"></textarea>
                 </label>
               </div>
             </div>
@@ -74,6 +74,21 @@
             </div>
             <div class="InputBox">
               <button type="submit">Edit</button>
+            </div>
+
+            <div class="InputBox">
+              <button type="button" onclick="showDeleteField()" class="delete">Delte board?</button>
+              <div id="showDeleteField" style="display: none" class="InputBox">
+                <div class="InputField">
+                  <label class="label">
+                    <span class="span">Permanent delete?</span>
+                    <input type="text" class="input" name="value" placeholder="type: |DELETE| to confirm">
+                  </label>
+                </div>
+                <div class="InputBox">
+                  <button type="submit" class="delete">Confirm</button>
+                </div>
+              </div>
             </div>
           </div>
         </form>
@@ -84,6 +99,42 @@
 </main>
 <script th:src="@{/js/notifications/dist/notifications.js}"></script>
 <script th:inline="javascript">
+  let showDeleteFieldNode = document.getElementById("showDeleteField");
+
+  function showDeleteField(){
+    if (showDeleteFieldNode.style.display === 'none') {
+      showDeleteFieldNode.style.display = 'block';
+    } else {
+      showDeleteFieldNode.style.display = 'none';
+    }
+  }
+
+
+
+  function calcHeight(value) {
+    let numberOfLineBrakes = (value.match(/\n/g) || []).length;
+    let newHeight = 20 + numberOfLineBrakes * 20 + 12 + 2;
+    return newHeight
+  }
+  let textarea = document.getElementById("textArea")
+
+  textarea.addEventListener("keyup", () => {
+    if (calcHeight(textarea.value) > 71){
+      textarea.style.height = calcHeight(textarea.value) + "px";
+      if (textLabel1 !== null) {
+        textLabel1.style.height = calcHeight(textarea.value) + 'px';
+      } else {
+        textLabel2.style.height = calcHeight(textarea.value) + 'px';
+      }
+    } else {
+      textarea.style.height = '70px'
+      if (textLabel1 !== null) {
+        textLabel1.style.height = '70px';
+      } else {
+        textLabel2.style.height = '70px';
+      }
+    }
+  })
   /*<![CDATA[*/
   const errors = /*[[${errors}]]*/ ['ph'];
   let errorNode = document.getElementById("hasErrors")

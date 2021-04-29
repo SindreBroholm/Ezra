@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link th:href="@{/css/headerFragment.css}" rel="stylesheet"/>
     <link th:href="@{/css/mainPageStyles.css}" rel="stylesheet"/>
+    <link th:href="@{/js/notifications/dist/notifications.css}" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
           rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.5.1/main.css" rel="stylesheet"/>
@@ -30,8 +31,27 @@
     <section id="rightOfMain" class="div"></section>
 </article>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.5.1/main.min.js"></script>
+<script th:src="@{/js/notifications/dist/notifications.js}"></script>
 <script th:inline="javascript">
     /*<![CDATA[*/
+    const messageNoty = /*[[${msg}]]*/ "";
+
+    if (messageNoty !== ""){
+    function myNotify() {
+        const notify =  window.createNotification({
+            positionClass: 'nfc-top-right',
+            displayCloseButton: false,
+            onclick: true,
+            showDuration: 35000,
+            theme: 'success'
+        });
+        notify({
+            title:'Message',
+            message: messageNoty.toString()
+        })
+    }
+        myNotify();
+    }
     document.addEventListener('DOMContentLoaded', function () {
 
         /*This is an array of all events connected to user*/
