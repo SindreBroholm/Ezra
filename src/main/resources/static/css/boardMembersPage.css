@@ -38,8 +38,8 @@
     grid-template-columns: 0.5fr 1fr 0.5fr;
     gap: 50px 0px;
     grid-template-areas:
-        "leftbox main ."
-        ". rightbox .";
+        "leftbox main eprofile"
+        ". rightbox eprofile";
     margin-top: 50px;
 }
 
@@ -105,4 +105,7 @@
 }
 #inviteBox{
     padding: 20px;
+}
+.editProfileSection{
+    grid-area: eprofile;
 }

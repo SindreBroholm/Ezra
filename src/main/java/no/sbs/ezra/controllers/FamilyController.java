@@ -8,13 +8,19 @@ import no.sbs.ezra.data.repositories.FamilyDataRepository;
 import no.sbs.ezra.data.repositories.FamilyRequestRepository;
 import no.sbs.ezra.data.repositories.UserDataRepository;
 import no.sbs.ezra.data.repositories.UserRoleRepository;
+import no.sbs.ezra.data.validators.UserDataValidator;
+import no.sbs.ezra.security.PasswordConfig;
 import no.sbs.ezra.security.UserPermission;
 import no.sbs.ezra.servises.EmailService;
 import no.sbs.ezra.servises.EventToJsonService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.validation.Valid;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +35,7 @@ public class FamilyController {
     private final EmailService emailService;
     private final EventToJsonService eventToJsonService;
     private final UserRoleRepository userRoleRepository;
+    private final PasswordConfig passwordEncoder;
 
     @GetMapping("/")
     public String getMainPage(Model model, Principal principal, @ModelAttribute("message") String msg) {
@@ -44,15 +51,51 @@ public class FamilyController {
     }
 
     @GetMapping("/family")
-    public String getFamilyPage(Model model, Principal principal){
+    public String getFamilyPage(Model model, Principal principal,
+                                @ModelAttribute("errors") String errors){
         if (userDataRepository.findByEmail(principal.getName()) != null){
             UserData user = userDataRepository.findByEmail(principal.getName());
-
+            System.out.println(errors);
+            model.addAttribute("errors", errors.split(","));
             model.addAttribute("user", user);
             model.addAttribute("famPendingRequest", getPendingFamilyRequests(user));
             model.addAttribute("myFamily", getMyFamily(user));
         }
         return "familyPage";
+    }
+    @RequestMapping(value = "/family/editProfile")
+    public String editProfile(@Valid @ModelAttribute("user") UserData user, BindingResult br,
+                              @RequestParam(name = "value") String password, Model model, Principal principal,
+                              RedirectAttributes redirectAttributes){
+        UserDataValidator validation = new UserDataValidator(userDataRepository, principal);
+        if (validation.supports(user.getClass())) {
+            validation.validate(user, br);
+        }
+        UserData updateUser = userDataRepository.findByEmail(principal.getName());
+        if (br.hasErrors() || !passwordEncoder.passwordEncoder().matches(password, updateUser.getPassword())) {
+            if (!passwordEncoder.passwordEncoder().matches(password, updateUser.getPassword())){
+                br.addError(new ObjectError("user", "Password didn't match"));
+            }
+            redirectAttributes.addFlashAttribute("errors", getErrorMessages(br));
+            return "redirect:/family";
+        } else {
+            if(user.getPassword().length() > 6 && user.getPassword().length() < 300){
+                updateUser.setEmail(user.getEmail());
+                updateUser.setFirstname(user.getFirstname());
+                updateUser.setLastname(user.getLastname());
+                updateUser.setPhone_number(user.getPhone_number());
+                updateUser.setPassword(passwordEncoder.passwordEncoder().encode(user.getPassword()));
+                userDataRepository.save(updateUser);
+            }
+            if (passwordEncoder.passwordEncoder().matches(password, updateUser.getPassword())){
+                updateUser.setEmail(user.getEmail());
+                updateUser.setFirstname(user.getFirstname());
+                updateUser.setLastname(user.getLastname());
+                updateUser.setPhone_number(user.getPhone_number());
+                userDataRepository.save(updateUser);
+            }
+        }
+        return "redirect:/family";
     }
 
     @RequestMapping( value = "/family/{memberId}", method = RequestMethod.POST)
@@ -141,4 +184,13 @@ public class FamilyController {
         }
         return familyId;
     }
+    private List<String> getErrorMessages(BindingResult br) {
+            List<ObjectError> allErrors = br.getAllErrors();
+            List<String> errors = new ArrayList<>();
+            for (ObjectError e :
+                    allErrors) {
+                errors.add(e.getDefaultMessage());
+            }
+            return errors;
+        }
 }

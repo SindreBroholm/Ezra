@@ -8,12 +8,16 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
+import java.security.Principal;
+
 public class UserDataValidator implements Validator {
 
     private final UserDataRepository repository;
+    private final Principal principal;
 
-    public UserDataValidator(UserDataRepository repository) {
+    public UserDataValidator(UserDataRepository repository, Principal principal) {
         this.repository = repository;
+        this.principal = principal;
     }
 
     @Override
@@ -25,7 +29,9 @@ public class UserDataValidator implements Validator {
     public void validate(@NonNull Object o, @NonNull Errors errors) {
         UserData user = (UserData) o;
         if (repository.findByEmail(user.getEmail()) != null) {
-            errors.rejectValue("email", "email.error", "E-mail not available, forgot password?");
+            if (repository.findByEmail(principal.getName()) != repository.findByEmail(user.getEmail())){
+                errors.rejectValue("email", "email.error", "E-mail not available");
+            }
         }
         ValidationUtils.rejectIfEmptyOrWhitespace(errors,"email", "email.error", "Please enter an e-mail");
 
@@ -43,8 +49,11 @@ public class UserDataValidator implements Validator {
             errors.rejectValue("lastname", "lastname.error", "Last name is to long");
         }
 
+
         if (user.getPassword().length() < 6) {
-            errors.rejectValue("password", "password.error", "Password is to short");
+            if (repository.findByEmail(principal.getName()) != repository.findByEmail(user.getEmail())){
+                errors.rejectValue("password", "password.error", "Password is to short");
+            }
         }
 
         if (user.getPassword().length() > 300) {

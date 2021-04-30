@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,8 +48,8 @@ public class AccessController {
 
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
     public String createNewUser(@Valid @ModelAttribute("UserData") UserData userData, BindingResult br,
-                                RedirectAttributes redirectAttributes, Model model) {
-        UserDataValidator validation = new UserDataValidator(userDataRepository);
+                                RedirectAttributes redirectAttributes, Model model, Principal principal) {
+        UserDataValidator validation = new UserDataValidator(userDataRepository, principal);
         if (validation.supports(userData.getClass())) {
             validation.validate(userData, br);
         }
