@@ -46,13 +46,13 @@ public class BoardController {
             UserData user = userDataRepository.findByEmail(principal.getName());
             BoardData board = boardDataRepository.findById(boardId).get();
             UserRole userRole = userRoleRepository.findByBoardIdAndUserId(board.getId(), user.getId());
-
             handleFirstTimeVisitor(board, user);
+            if (board.isPrivateBoard() && userRole.getMembershipType() == UserPermission.VISITOR) return HOME_PAGE;
             model.addAttribute("userPermission", userRoleRepository.findByBoardIdAndUserId(boardId, user.getId()));
             model.addAttribute("board", board);
             try {
                 model.addAttribute("events", permissionService.getAllEventsFromBoardByUserPermission(board, userRole.getMembershipType()));
-            } catch (NullPointerException ignore){};
+            } catch (NullPointerException ignore){}
             return "boardPage";
         }
         return HOME_PAGE;
@@ -67,6 +67,7 @@ public class BoardController {
             UserRole role = userRoleRepository.findByBoardIdAndUserId(board.getId(), user.getId());
             if (permissionService.doesUserHaveAdminRights(role.getMembershipType())) {
                 model.addAttribute("board", board);
+                model.addAttribute("userRole", role);
                 model.addAttribute("eventData", getNewOrExistingEvent(eventId));
                 return "createOrEditEventPage";
             }
@@ -114,12 +115,38 @@ public class BoardController {
         return "createNewBoardPage";
     }
 
+
+    /*
+    * When notification gets implemented this need to be fixed !!
+    * --For now only sends invite if sentTO is not a user jet or never have visited the board.
+    * If Spam becomes a problem, make it so the invite only sends to created users.
+    * */
     @RequestMapping(value = "/board/{boardId}/sendInvite")
     public String sendInviteByMail(@PathVariable Integer boardId, @RequestParam String sendTo, Principal principal){
         if (boardDataRepository.findById(boardId).isPresent()){
             BoardData board = boardDataRepository.findById(boardId).get();
             if (sendTo.matches("^(.+)@(.+)$")){
-                emailService.sendEmailInviteToBoard(sendTo, principal, board);
+                if (userDataRepository.findByEmail(sendTo) != null){
+                    UserData sender = userDataRepository.findByEmail(principal.getName());
+                    UserData invitedUser = userDataRepository.findByEmail(sendTo);
+                    if (boardId == sender.getMyBoardId()){
+                        /*
+                        * This makes it possible for a user to invite another user to their private board.
+                        * Will also make it possible to keep a board private and for the master to invite other users.
+                        * */
+                        if (userRoleRepository.findByBoardIdAndUserId(board.getId(), invitedUser.getId()) == null){
+                            userRoleRepository.save(new UserRole(invitedUser, board, UserPermission.FOLLOWER, false));
+                        }
+                    } else {
+                        if (userRoleRepository.findByBoardIdAndUserId(board.getId(), invitedUser.getId()) == null){
+                            emailService.sendEmailInviteToBoard(sendTo, principal, board);
+                        }
+                    }
+                }
+                //Remove this else if spam becomes a problem.
+                else {
+                    emailService.sendEmailInviteToBoard(sendTo, principal, board);
+                }
             }
         }
         return "redirect:/board/" + boardId;
@@ -127,7 +154,8 @@ public class BoardController {
 
     @RequestMapping(value = "/createBoard", method = RequestMethod.POST)
     public String CreateNewBoard(@Valid @ModelAttribute("BoardData") BoardData boardData, BindingResult br,
-                                 Principal principal, Model model) {
+                                 Principal principal, Model model,
+                                 @RequestParam( name = "isPrivate", required = false) boolean isPrivate) {
         BoardDataValidator validator = new BoardDataValidator();
         model.addAttribute("user", userDataRepository.findByEmail(principal.getName()));
         if (validator.supports(boardData.getClass())) {
@@ -136,6 +164,9 @@ public class BoardController {
                 model.addAttribute("errors", getErrorMessages(br));
                 return "createNewBoardPage";
             } else {
+                if (isPrivate){
+                    boardData.setPrivateBoard(true);
+                }
                 boardDataRepository.save(boardData);
                 userRoleRepository.save(new UserRole(userDataRepository.findByEmail(principal.getName()), boardData, UserPermission.MASTER, false));
             }
@@ -146,7 +177,7 @@ public class BoardController {
     @RequestMapping(value = "/board/{boardId}/edit", method = RequestMethod.POST)
     public String editOrDeleteBoard(@PathVariable Integer boardId, @RequestParam(name = "value", required = false) String value,
                                     @ModelAttribute("BoardData") BoardData boardData, BindingResult br, Model model,
-                                    RedirectAttributes redirectAttributes) {
+                                    RedirectAttributes redirectAttributes, @RequestParam( name = "isPrivate", required = false, defaultValue = "false") boolean isPrivate) {
         if (boardDataRepository.findById(boardId).isPresent()) {
             BoardDataValidator validator = new BoardDataValidator();
             if (validator.supports(boardData.getClass())) {
@@ -164,7 +195,7 @@ public class BoardController {
                             return HOME_PAGE;
                         }
                     } else {
-                        updateBoardInformation(boardId, boardData);
+                        updateBoardInformation(boardId, boardData, isPrivate);
                         return "redirect:/board/" + boardId;
                     }
                 }
@@ -183,7 +214,7 @@ public class BoardController {
                 UserData member = userDataRepository.findById(memberId).get();
                 UserRole memberUr = userRoleRepository.findByBoardIdAndUserId(board.getId(), member.getId());
                 updateBoardMemberPermission(boardId, value, loggedInUser, memberUr);
-                return "redirect:/board/"+ boardId + "/members";
+                return String.format("redirect:/board/%d/members", boardId);
             }
         }
         return HOME_PAGE;
@@ -206,6 +237,7 @@ public class BoardController {
                     if (br.hasErrors()) {
                         model.addAttribute("errors", getErrorMessages(br));
                         model.addAttribute("board", board);
+                        model.addAttribute("userRole", role);
                         return "createOrEditEventPage";
                     } else {
                         saveOrUpdateEvent(eventData, eventId);
@@ -312,6 +344,9 @@ public class BoardController {
         }
         temp.add(UserPermission.MEMBER);
         temp.add(UserPermission.FOLLOWER);
+        if (permission.getPermission().equals("master")){
+            temp.add(UserPermission.VISITOR);
+        }
         return temp;
     }
 
@@ -330,9 +365,10 @@ public class BoardController {
             eventDataRepository.save(event);
         }
     }
-    private void updateBoardInformation(Integer boardId, BoardData boardData) {
+    private void updateBoardInformation(Integer boardId, BoardData boardData, boolean isPrivate) {
         if (boardDataRepository.findById(boardId).isPresent()){
             BoardData update = boardDataRepository.findById(boardId).get();
+            update.setPrivateBoard(isPrivate);
             update.setContactEmail(boardData.getContactEmail());
             update.setContactNumber(boardData.getContactNumber());
             update.setContactName(boardData.getContactName());

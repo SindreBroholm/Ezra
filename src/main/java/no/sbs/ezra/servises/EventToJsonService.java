@@ -66,12 +66,15 @@ public class EventToJsonService {
         for (UserRole ur :
                 familyUserRoles) {
             try{
-            events.addAll(
-                    permissionService.getAllEventsFromBoardByUserPermission(
-                            boardDataRepository.findById(ur.getBoard().getId()).get(),
-                            userRoleRepository.findByBoardIdAndUserId(ur.getBoard().getId(), ur.getUser().getId()).getMembershipType()));
+                if (!boardDataRepository.findById(ur.getBoard().getId()).get().isPrivateBoard()){
+                    events.addAll(
 
-                array.addAll(SetEventDataToJSONObjectForFamilyMembers(events, ur));
+                            permissionService.getAllEventsFromBoardByUserPermission(
+                                    boardDataRepository.findById(ur.getBoard().getId()).get(),
+                                    userRoleRepository.findByBoardIdAndUserId(ur.getBoard().getId(), ur.getUser().getId()).getMembershipType()));
+
+                    array.addAll(SetEventDataToJSONObjectForFamilyMembers(events, ur));
+                }
             } catch (Exception Ignore) {
             }
         }

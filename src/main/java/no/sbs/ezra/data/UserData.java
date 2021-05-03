@@ -32,6 +32,8 @@ public class UserData {
 
     private String phone_number;
 
+    private int myBoardId;
+
     public UserData(@NonNull String email, @NonNull String firstname,
                     @NonNull String lastname, @NonNull String password,
                     String phone_number) {

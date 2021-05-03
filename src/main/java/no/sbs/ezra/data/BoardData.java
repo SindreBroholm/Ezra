@@ -32,6 +32,8 @@ public class BoardData {
 
     private String description;
 
+    private boolean privateBoard = false;
+
     public BoardData() {
     }
 

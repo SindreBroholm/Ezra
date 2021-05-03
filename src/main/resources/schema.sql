@@ -22,6 +22,15 @@ create table ezra.board_data
     Homepage       varchar(100),
     primary key (Id)
 );
+create table ezra.personal_board_data
+(
+    Id             int unique auto_increment,
+    user_id        int unique not null,
+    Name           varchar(100) not null,
+
+    primary key (Id),
+    foreign key (user_id) references user_data (id) ON DELETE CASCADE
+);
 
 create table ezra.membership
 (

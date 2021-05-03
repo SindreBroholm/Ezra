@@ -32,8 +32,8 @@
 
   <!--pending request-->
   <section class="main">
+    <h2>Accept or deny family member requests</h2>
     <div th:if="${famPendingRequest.size() > 0}" class="gridContainer">
-      <h2>Accept or deny family member requests</h2>
       <div th:each="pending: ${famPendingRequest}" th:object="${pending}" class="borderBox">
         <div>
           <span th:text="*{firstname + ' ' + lastname}" class="infoInput"></span>

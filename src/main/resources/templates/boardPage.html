@@ -28,6 +28,7 @@
             <div class="boardBox">
                 <div class="logoImg">
                     <h2 th:text="*{name}">Welcome</h2>
+                    <h3 th:if="*{privateBoard}">This board is Private</h3>
                 </div>
                 <div id="infoBox">
                     <div id="infoElements">

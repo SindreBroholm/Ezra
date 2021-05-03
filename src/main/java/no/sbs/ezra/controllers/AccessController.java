@@ -5,6 +5,7 @@ import no.sbs.ezra.data.*;
 import no.sbs.ezra.data.repositories.*;
 import no.sbs.ezra.data.validators.UserDataValidator;
 import no.sbs.ezra.security.PasswordConfig;
+import no.sbs.ezra.security.UserPermission;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -27,6 +28,7 @@ public class AccessController {
 
     private final PasswordConfig passwordEncoder;
     private final UserDataRepository userDataRepository;
+    private final UserRoleRepository userRoleRepository;
     private final BoardDataRepository boardDataRepository;
     private final FamilyRequestRepository familyRequestRepository;
     private final FamilyDataRepository familyDataRepository;
@@ -59,6 +61,7 @@ public class AccessController {
         } else {
             userData.setPassword(passwordEncoder.passwordEncoder().encode(userData.getPassword()));
             userDataRepository.save(userData);
+            createPrivateBoardForNewUser(userData);
             if (familyRequestRepository.findByMemberEmail(userData.getEmail()).isPresent()){
                 FamilyRequest haveJoined = familyRequestRepository.findByMemberEmail(userData.getEmail()).get();
                 haveJoined.setHaveJoined(true);
@@ -85,6 +88,16 @@ public class AccessController {
         return "searchForBoardPage";
     }
 
+    private void createPrivateBoardForNewUser(UserData userData) {
+        BoardData bd = new BoardData(userData.getFirstname() + " " + userData.getLastname(),
+                userData.getFirstname() + " " + userData.getLastname(),
+                userData.getPhone_number(), userData.getEmail(), "", "");
+        bd.setPrivateBoard(true);
+        boardDataRepository.save(bd);
+        userData.setMyBoardId(bd.getId());
+        userDataRepository.save(userData);
+        userRoleRepository.save( new UserRole(userData, bd, UserPermission.MASTER, false));
+    }
     private List<BoardData> getSearchResults(String keyword) {
         List<BoardData> searchResults;
         if (keyword != null) {

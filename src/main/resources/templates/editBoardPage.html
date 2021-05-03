@@ -1,162 +1,185 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <meta name="author" content="Sindre Broholm Sæther">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link th:href="@{/css/loginPageStyle.css}" rel="stylesheet"/>
-  <link th:href="@{/css/globalElements.css}" rel="stylesheet"/>
-  <link th:href="@{/js/notifications/dist/notifications.css}" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
-        rel="stylesheet">
-  <title>Ezra</title>
+    <meta charset="UTF-8">
+    <meta name="author" content="Sindre Broholm Sæther">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link th:href="@{/css/loginPageStyle.css}" rel="stylesheet"/>
+    <link th:href="@{/css/globalElements.css}" rel="stylesheet"/>
+    <link th:href="@{/js/notifications/dist/notifications.css}" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          rel="stylesheet">
+    <title>Ezra</title>
 </head>
 <body>
 <main class="login-container">
-  <div id="loginHalf">
-    <div class="loginFormBox">
-      <div class="logoImg">
-        <h1>New board</h1>
-      </div>
-      <div id="formBox">
-        <form th:action="@{'/board/' + ${board.id} + '/edit'}" method="post" th:object="${board}">
-          <div id="loginBoxElements">
-            <div class="InputBox">
-              <div class="InputField">
-                <label class="label">
-                  <span class="span">Name</span>
-                  <input type="text" class="input" th:field="*{name}" th:errorclass="filderror" autofocus="autofocus">
-                </label>
-              </div>
+    <div id="loginHalf">
+        <div class="loginFormBox">
+            <div class="logoImg">
+                <h1>New board</h1>
             </div>
-            <div class="InputBox">
-              <div class="InputField">
-                <label class="label">
-                  <span class="span">Contact name</span>
-                  <input type="text" class="input" th:field="*{contactName}" th:placeholder="*{contactName}" th:errorclass="filderror">
-                </label>
-              </div>
-            </div>
-            <div class="InputBox">
-              <div class="InputField">
-                <label class="label">
-                  <span class="span">Contact phone number</span>
-                  <input type="text" class="input" th:field="*{contactNumber}" th:placeholder="*{contactNumber}" th:errorclass="filderror">
-                </label>
-              </div>
-            </div>
-            <div class="InputBox">
-              <div class="InputField">
-                <label class="label">
-                  <span class="span">Contact e-mail</span>
-                  <input type="text" class="input" th:field="*{contactEmail}" th:placeholder="*{contactEmail}" th:errorclass="filderror">
-                </label>
-              </div>
-            </div>
-            <div class="InputBox">
-              <div class="InputField">
-                <label class="label">
-                  <span class="span">Homepage</span>
-                  <input type="text" class="input" th:field="*{homepage}" th:placeholder="*{homepage}" th:errorclass="filderror">
-                </label>
-              </div>
-            </div>
-            <div class="InputBox">
-              <div class="InputField">
-                <label id="textLabel1" class="label">
-                  <span class="span">Description</span>
-                  <textarea id="textArea" class="input" th:field="*{description}" th:errorclass="filderror"></textarea>
-                </label>
-              </div>
-            </div>
-            <div th:if="${errors.size() > 0}">
-              <span id="hasErrors"></span>
-            </div>
-            <div class="InputBox">
-              <button type="submit">Edit</button>
-            </div>
+            <div id="formBox">
+                <form th:action="@{'/board/' + ${board.id} + '/edit'}" method="post" th:object="${board}">
+                    <div id="loginBoxElements">
+                        <div class="InputBox">
+                            <div class="InputField">
+                                <label class="label">
+                                    <span class="span">Name</span>
+                                    <input type="text" class="input" th:field="*{name}" th:errorclass="filderror"
+                                           autofocus="autofocus">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="InputBox">
+                            <div class="InputField">
+                                <label class="label">
+                                    <span class="span">Contact name</span>
+                                    <input type="text" class="input" th:field="*{contactName}"
+                                           th:placeholder="*{contactName}" th:errorclass="filderror">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="InputBox">
+                            <div class="InputField">
+                                <label class="label">
+                                    <span class="span">Contact phone number</span>
+                                    <input type="text" class="input" th:field="*{contactNumber}"
+                                           th:placeholder="*{contactNumber}" th:errorclass="filderror">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="InputBox">
+                            <div class="InputField">
+                                <label class="label">
+                                    <span class="span">Contact e-mail</span>
+                                    <input type="text" class="input" th:field="*{contactEmail}"
+                                           th:placeholder="*{contactEmail}" th:errorclass="filderror">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="InputBox">
+                            <div class="InputField">
+                                <label class="label">
+                                    <span class="span">Homepage</span>
+                                    <input type="text" class="input" th:field="*{homepage}" th:placeholder="*{homepage}"
+                                           th:errorclass="filderror">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="InputBox">
+                            <div class="InputField">
+                                <label id="textLabel1" class="label">
+                                    <span class="span">Description</span>
+                                    <textarea id="textArea" class="input" th:field="*{description}"
+                                              th:errorclass="filderror"></textarea>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="InputBox" th:if="*{privateBoard}">
+                            <div class="radioButtonsBox">
+                                <label>
+                                    <span>Set to public?</span>
+                                    <input type="checkbox" name="isPrivate" value="false">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="InputBox" th:if="*{!privateBoard}">
+                            <div class="radioButtonsBox">
+                                <label>
+                                    <span>Set to private?</span>
+                                    <input type="checkbox" name="isPrivate" value="true">
+                                </label>
+                            </div>
+                        </div>
+                        <div th:if="${errors.size() > 0}">
+                            <span id="hasErrors"></span>
+                        </div>
+                        <div class="InputBox">
+                            <button type="submit">Edit</button>
+                        </div>
 
-            <div class="InputBox">
-              <button type="button" onclick="showDeleteField()" class="delete">Delte board?</button>
-              <div id="showDeleteField" style="display: none" class="InputBox">
-                <div class="InputField">
-                  <label class="label">
-                    <span class="span">Permanent delete?</span>
-                    <input type="text" class="input" name="value" placeholder="type: |DELETE| to confirm">
-                  </label>
-                </div>
-                <div class="InputBox">
-                  <button type="submit" class="delete">Confirm</button>
-                </div>
-              </div>
+                        <div class="InputBox">
+                            <button type="button" onclick="showDeleteField()" class="delete">Delte board?</button>
+                            <div id="showDeleteField" style="display: none" class="InputBox">
+                                <div class="InputField">
+                                    <label class="label">
+                                        <span class="span">Permanent delete?</span>
+                                        <input type="text" class="input" name="value"
+                                               placeholder="type: |DELETE| to confirm">
+                                    </label>
+                                </div>
+                                <div class="InputBox">
+                                    <button type="submit" class="delete">Confirm</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
             </div>
-          </div>
-        </form>
-      </div>
+        </div>
     </div>
-  </div>
-  <div id="imgHalf"></div>
+    <div id="imgHalf"></div>
 </main>
 <script th:src="@{/js/notifications/dist/notifications.js}"></script>
 <script th:inline="javascript">
-  let showDeleteFieldNode = document.getElementById("showDeleteField");
+    let showDeleteFieldNode = document.getElementById("showDeleteField");
 
-  function showDeleteField(){
-    if (showDeleteFieldNode.style.display === 'none') {
-      showDeleteFieldNode.style.display = 'block';
-    } else {
-      showDeleteFieldNode.style.display = 'none';
+    function showDeleteField() {
+        if (showDeleteFieldNode.style.display === 'none') {
+            showDeleteFieldNode.style.display = 'block';
+        } else {
+            showDeleteFieldNode.style.display = 'none';
+        }
     }
-  }
 
 
-
-  function calcHeight(value) {
-    let numberOfLineBrakes = (value.match(/\n/g) || []).length;
-    let newHeight = 20 + numberOfLineBrakes * 20 + 12 + 2;
-    return newHeight
-  }
-  let textarea = document.getElementById("textArea")
-
-  textarea.addEventListener("keyup", () => {
-    if (calcHeight(textarea.value) > 71){
-      textarea.style.height = calcHeight(textarea.value) + "px";
-      if (textLabel1 !== null) {
-        textLabel1.style.height = calcHeight(textarea.value) + 'px';
-      } else {
-        textLabel2.style.height = calcHeight(textarea.value) + 'px';
-      }
-    } else {
-      textarea.style.height = '70px'
-      if (textLabel1 !== null) {
-        textLabel1.style.height = '70px';
-      } else {
-        textLabel2.style.height = '70px';
-      }
+    function calcHeight(value) {
+        let numberOfLineBrakes = (value.match(/\n/g) || []).length;
+        let newHeight = 20 + numberOfLineBrakes * 20 + 12 + 2;
+        return newHeight
     }
-  })
-  /*<![CDATA[*/
-  const errors = /*[[${errors}]]*/ ['ph'];
-  let errorNode = document.getElementById("hasErrors")
-  console.log(errors.toString())
-  if (errorNode != null) {
-    const myNotify = window.createNotification({
-      positionClass: 'nfc-top-right',
-      displayCloseButton: false,
-      onclick: true,
-      showDuration: 35000,
-      theme: 'error'
-    });
-    if (errors[0] !== undefined) {
-      for (let i = 0; i < errors.length; i++) {
-        myNotify({
-          title: "Error",
-          message: errors[i]
-        })
-      }
+
+    let textarea = document.getElementById("textArea")
+
+    textarea.addEventListener("keyup", () => {
+        if (calcHeight(textarea.value) > 71) {
+            textarea.style.height = calcHeight(textarea.value) + "px";
+            if (textLabel1 !== null) {
+                textLabel1.style.height = calcHeight(textarea.value) + 'px';
+            } else {
+                textLabel2.style.height = calcHeight(textarea.value) + 'px';
+            }
+        } else {
+            textarea.style.height = '70px'
+            if (textLabel1 !== null) {
+                textLabel1.style.height = '70px';
+            } else {
+                textLabel2.style.height = '70px';
+            }
+        }
+    })
+    /*<![CDATA[*/
+    const errors = /*[[${errors}]]*/ ['ph'];
+    let errorNode = document.getElementById("hasErrors")
+    console.log(errors.toString())
+    if (errorNode != null) {
+        const myNotify = window.createNotification({
+            positionClass: 'nfc-top-right',
+            displayCloseButton: false,
+            onclick: true,
+            showDuration: 35000,
+            theme: 'error'
+        });
+        if (errors[0] !== undefined) {
+            for (let i = 0; i < errors.length; i++) {
+                myNotify({
+                    title: "Error",
+                    message: errors[i]
+                })
+            }
+        }
     }
-  }
-  /*]]>*/
+    /*]]>*/
 </script>
 </body>
 </html>

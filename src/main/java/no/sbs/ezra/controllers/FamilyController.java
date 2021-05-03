@@ -55,7 +55,6 @@ public class FamilyController {
                                 @ModelAttribute("errors") String errors){
         if (userDataRepository.findByEmail(principal.getName()) != null){
             UserData user = userDataRepository.findByEmail(principal.getName());
-            System.out.println(errors);
             model.addAttribute("errors", errors.split(","));
             model.addAttribute("user", user);
             model.addAttribute("famPendingRequest", getPendingFamilyRequests(user));
@@ -63,9 +62,10 @@ public class FamilyController {
         }
         return "familyPage";
     }
+
     @RequestMapping(value = "/family/editProfile")
     public String editProfile(@Valid @ModelAttribute("user") UserData user, BindingResult br,
-                              @RequestParam(name = "value") String password, Model model, Principal principal,
+                              @RequestParam(name = "value") String password, Principal principal,
                               RedirectAttributes redirectAttributes){
         UserDataValidator validation = new UserDataValidator(userDataRepository, principal);
         if (validation.supports(user.getClass())) {
@@ -79,21 +79,7 @@ public class FamilyController {
             redirectAttributes.addFlashAttribute("errors", getErrorMessages(br));
             return "redirect:/family";
         } else {
-            if(user.getPassword().length() > 6 && user.getPassword().length() < 300){
-                updateUser.setEmail(user.getEmail());
-                updateUser.setFirstname(user.getFirstname());
-                updateUser.setLastname(user.getLastname());
-                updateUser.setPhone_number(user.getPhone_number());
-                updateUser.setPassword(passwordEncoder.passwordEncoder().encode(user.getPassword()));
-                userDataRepository.save(updateUser);
-            }
-            if (passwordEncoder.passwordEncoder().matches(password, updateUser.getPassword())){
-                updateUser.setEmail(user.getEmail());
-                updateUser.setFirstname(user.getFirstname());
-                updateUser.setLastname(user.getLastname());
-                updateUser.setPhone_number(user.getPhone_number());
-                userDataRepository.save(updateUser);
-            }
+            updateUser(user, updateUser);
         }
         return "redirect:/family";
     }
@@ -120,7 +106,8 @@ public class FamilyController {
     }
 
     @RequestMapping(value = "/familyMember", method = RequestMethod.POST)
-    public String sendFamilyMemberRequestByMail(@RequestParam String sendTo, Principal principal){
+    public String sendFamilyMemberRequestByMail(@RequestParam String sendTo, Principal principal,
+                                                RedirectAttributes ra){
         if (sendTo.matches("^(.+)@(.+)$")){
             UserData sender = userDataRepository.findByEmail(principal.getName());
             if (userDataRepository.findByEmail(sendTo) != null){
@@ -131,9 +118,16 @@ public class FamilyController {
                 emailService.sendFamilyMemberRequest(sendTo, principal);
                 familyRequestRepository.save(new FamilyRequest(sender, sendTo, false));
             }
+        } else {
+            ra.addFlashAttribute("errors", "Not a valid Email");
         }
         return "redirect:/family";
     }
+
+    /*
+    * Since family_id is a String we need to split it and filter out witch id is user_id and witch one to search for.
+    *  EKS: if user_id is 1 and family_id is "1_13" we have to return the id of 13.
+    * */
 
     private List<UserData> getPendingFamilyRequests(UserData user){
         List<FamilyData> pending = familyDataRepository.findAllByUserOneIdOrUserTwoIdAndPendingRequest(user.getId(), user.getId(), true);
@@ -174,6 +168,23 @@ public class FamilyController {
             }
         }
         return familyData;
+    }
+
+    private void updateUser(UserData user, UserData updateUser) {
+        if(user.getPassword().length() > 6 && user.getPassword().length() < 300){
+            updateUser.setEmail(user.getEmail());
+            updateUser.setFirstname(user.getFirstname());
+            updateUser.setLastname(user.getLastname());
+            updateUser.setPhone_number(user.getPhone_number());
+            updateUser.setPassword(passwordEncoder.passwordEncoder().encode(user.getPassword()));
+            userDataRepository.save(updateUser);
+        } else {
+            updateUser.setEmail(user.getEmail());
+            updateUser.setFirstname(user.getFirstname());
+            updateUser.setLastname(user.getLastname());
+            updateUser.setPhone_number(user.getPhone_number());
+            userDataRepository.save(updateUser);
+        }
     }
     private String getFamilyId(UserData user, UserData member){
         String familyId;

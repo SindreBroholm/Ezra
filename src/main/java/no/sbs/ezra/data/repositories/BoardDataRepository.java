@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface BoardDataRepository extends CrudRepository<BoardData, Integer> {
 
-    @Query("SELECT b FROM BoardData b WHERE b.name like %?1%")
+    @Query("SELECT b FROM BoardData b WHERE b.name like %?1% and b.privateBoard = false")
     List<BoardData> search(String search);
 
 
