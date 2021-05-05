@@ -6,8 +6,6 @@ import no.sbs.ezra.data.repositories.*;
 import no.sbs.ezra.data.validators.UserDataValidator;
 import no.sbs.ezra.security.PasswordConfig;
 import no.sbs.ezra.security.UserPermission;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -23,8 +21,6 @@ import java.util.List;
 @Controller
 @AllArgsConstructor
 public class AccessController {
-
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final PasswordConfig passwordEncoder;
     private final UserDataRepository userDataRepository;

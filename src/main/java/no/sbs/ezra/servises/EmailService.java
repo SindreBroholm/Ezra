@@ -3,8 +3,6 @@ package no.sbs.ezra.servises;
 import no.sbs.ezra.data.BoardData;
 import no.sbs.ezra.data.UserData;
 import no.sbs.ezra.data.repositories.UserDataRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -15,7 +13,7 @@ import java.security.Principal;
 @Service
 public class EmailService {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     private final JavaMailSender javaMailSender;
     private final UserDataRepository userDataRepository;
 
@@ -37,7 +35,6 @@ public class EmailService {
         try{
             javaMailSender.send(simpleMailMessage);
         } catch (MailException e){
-            logger.error("Unable to send inviteToBoard email with EmailService");
             e.getMessage();
         }
     }
@@ -58,7 +55,6 @@ public class EmailService {
         try{
             javaMailSender.send(simpleMailMessage);
         } catch (MailException e){
-            logger.error("Unable to send familyMemberRequest with EmailService");
             e.getMessage();
         }
     }

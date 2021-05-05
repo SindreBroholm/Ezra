@@ -8,8 +8,6 @@ import no.sbs.ezra.data.repositories.BoardDataRepository;
 import no.sbs.ezra.data.repositories.UserRoleRepository;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,7 +17,6 @@ import java.util.List;
 @Service
 public class EventToJsonService {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final UserRoleRepository userRoleRepository;
     private final PermissionService permissionService;
     private final BoardDataRepository boardDataRepository;
