@@ -20,6 +20,8 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
+import static no.sbs.ezra.constants.Constants.FAMILY_PAGE;
+
 @Controller
 @AllArgsConstructor
 public class FamilyController {
@@ -72,11 +74,11 @@ public class FamilyController {
                 br.addError(new ObjectError("user", "Password didn't match"));
             }
             redirectAttributes.addFlashAttribute("errors", getErrorMessages(br));
-            return "redirect:/family";
+            return FAMILY_PAGE;
         } else {
             updateUser(user, updateUser);
         }
-        return "redirect:/family";
+        return FAMILY_PAGE;
     }
 
     @RequestMapping(value = "/family/{memberId}", method = RequestMethod.POST)
@@ -86,26 +88,41 @@ public class FamilyController {
             UserData user = userDataRepository.findByEmail(principal.getName());
             if (userDataRepository.findById(memberId).isPresent()) {
                 UserData member = userDataRepository.findById(memberId).get();
-                FamilyData familyData = familyDataRepository.findByFamilyId(getFamilyId(user, member));
-
-
-                /*
-                * Accepted familyMembers will be set to admins for users private board.
-                * */
-                if (value) {
-                    familyData.setAreFamily(true);
-                    familyData.setPendingRequest(false);
-                    familyDataRepository.save(familyData);
-                    if (boardDataRepository.findById(user.getMyBoardId()).isPresent()){
-                        BoardData privateBoard = boardDataRepository.findById(user.getMyBoardId()).get();
-                        userRoleRepository.save(new UserRole(member, privateBoard, UserPermission.ADMIN, false));
-                    }
-                } else {
-                    familyDataRepository.delete(familyData);
-                }
+                acceptOrDeleteFamilyRequest(value, user, member);
             }
         }
-        return "redirect:/family";
+        return FAMILY_PAGE;
+    }
+
+    private void acceptOrDeleteFamilyRequest(boolean value, UserData user, UserData member) {
+        FamilyData familyData = familyDataRepository.findByFamilyId(getFamilyId(user, member));
+        if (value) {
+            familyData.setAreFamily(true);
+            familyData.setPendingRequest(false);
+            familyDataRepository.save(familyData);
+            setUserRoleToAdminForFamilyMembersPrivateBoard(user, member);
+        }
+        if (!value){
+            if (boardDataRepository.findById(member.getMyBoardId()).isPresent()){
+                BoardData memberBoard = boardDataRepository.findById(member.getMyBoardId()).get();
+                UserRole userToMemberRole = userRoleRepository.findByBoardIdAndUserId(memberBoard.getId(), user.getId());
+                UserRole memberToUserRole = userRoleRepository.findByBoardIdAndUserId(user.getMyBoardId(), member.getId());
+                familyDataRepository.delete(familyData);
+                userRoleRepository.delete(userToMemberRole);
+                userRoleRepository.delete(memberToUserRole);
+            }
+        }
+    }
+
+    private void setUserRoleToAdminForFamilyMembersPrivateBoard(UserData user, UserData member) {
+        if (boardDataRepository.findById(user.getMyBoardId()).isPresent()){
+            BoardData privateBoard = boardDataRepository.findById(user.getMyBoardId()).get();
+            userRoleRepository.save(new UserRole(member, privateBoard, UserPermission.ADMIN, false));
+            if (boardDataRepository.findById(member.getMyBoardId()).isPresent()){
+                BoardData famMemberPrivateBoard = boardDataRepository.findById(member.getMyBoardId()).get();
+                userRoleRepository.save(new UserRole(user, famMemberPrivateBoard, UserPermission.ADMIN, false));
+            }
+        }
     }
 
     @RequestMapping(value = "/familyMember", method = RequestMethod.POST)
@@ -124,7 +141,7 @@ public class FamilyController {
         } else {
             ra.addFlashAttribute("errors", "Not a valid Email");
         }
-        return "redirect:/family";
+        return FAMILY_PAGE;
     }
 
 
