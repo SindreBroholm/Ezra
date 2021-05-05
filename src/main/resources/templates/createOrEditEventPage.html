@@ -74,6 +74,12 @@
                         <div class="InputBox">
                             <div class="radioButtonsBox">
                                 <span>Who can see this event?</span>
+                                <div th:if="${userRole.membershipType == T(no.sbs.ezra.security.UserPermission).MASTER}">
+                                    <label>Private
+                                        <input type="radio" th:field="*{membershipType}" th:errorclass="filderror"
+                                               th:value="${T(no.sbs.ezra.security.UserPermission).MASTER}">
+                                    </label>
+                                </div>
                                 <label>Admins
                                     <input type="radio" th:field="*{membershipType}" th:errorclass="filderror"
                                            th:value="${T(no.sbs.ezra.security.UserPermission).ADMIN}">
@@ -118,7 +124,6 @@
                             <div class="InputField">
                                 <label id="textLabel2" class="label">
                                     <span class="span">Description</span>
-                                    <!--<input type="text" class="input" th:field="*{message}" th:errorclass="filderror">-->
                                     <textarea id="textArea" class="input" th:field="*{message}"
                                               th:errorclass="filderror"></textarea>
                                 </label>

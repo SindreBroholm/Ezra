@@ -138,8 +138,18 @@ public class BoardController {
                             userRoleRepository.save(new UserRole(invitedUser, board, UserPermission.FOLLOWER, false));
                         }
                     } else {
-                        if (userRoleRepository.findByBoardIdAndUserId(board.getId(), invitedUser.getId()) == null){
+                        if (userRoleRepository.findByBoardIdAndUserId(board.getId(), invitedUser.getId()) != null){
                             emailService.sendEmailInviteToBoard(sendTo, principal, board);
+                        }else {
+                            if (userRoleRepository.findByBoardIdAndUserId(board.getId(), sender.getId()).getMembershipType() == UserPermission.MASTER){
+                                if (userRoleRepository.findByBoardIdAndUserId(board.getId(), invitedUser.getId()) == null){
+                                    userRoleRepository.save(new UserRole(invitedUser, board, UserPermission.FOLLOWER, false));
+                                } else {
+                                    UserRole ur = userRoleRepository.findByBoardIdAndUserId(board.getId(), invitedUser.getId());
+                                    ur.setMembershipType(UserPermission.FOLLOWER);
+                                    userRoleRepository.save(ur);
+                                }
+                            }
                         }
                     }
                 }

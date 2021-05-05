@@ -28,17 +28,22 @@ public class FamilyData {
 
     private boolean areFamily;
 
+    @JoinColumn(name = "requested_by", referencedColumnName = "id")
+    @ManyToOne(targetEntity = UserData.class)
+    private UserData requestedBy;
+
 
     /*
     * The user with the lowest ID will be set to userOne
     * the familyId will be set to "userOneId_userTwoId" = "1_2" <-- example.
     * Always get familyData based on familyId
     * */
-    public FamilyData(UserData userOne, UserData userTwo, boolean pendingRequest, boolean areFamily) {
+    public FamilyData(UserData userOne, UserData userTwo, boolean pendingRequest, boolean areFamily, UserData requestedBy) {
         this.pendingRequest = pendingRequest;
         this.areFamily = areFamily;
         this.userOne = userOne;
         this.userTwo = userTwo;
+        this.requestedBy = requestedBy;
 
         if (userOne.getId() > userTwo.getId()){
             this.familyId = userTwo.getId() + "_" + userOne.getId();

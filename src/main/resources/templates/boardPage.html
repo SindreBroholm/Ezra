@@ -88,7 +88,7 @@
                 </div>
             </div>
             <div th:if="${!userPermission.membershipType.getPermission().equals('visitor')}" class="pa30">
-                <div>
+                <div th:if="${userPermission.membershipType.getPermission().equals('master') || !board.privateBoard}">
                     <form th:action="@{'/board/' + *{id}+ '/sendInvite'}" method="post">
                         <input type="text" name="sendTo" placeholder="ola.nordmann@mail.no" class="inputStyle">
                         <button class="link" type="submit">Invite</button>

@@ -68,7 +68,7 @@ public class AccessController {
                 familyRequestRepository.save(haveJoined);
                 if (userDataRepository.findById(haveJoined.getUser().getId()).isPresent()){
                     UserData sender = userDataRepository.findById(haveJoined.getUser().getId()).get();
-                    familyDataRepository.save(new FamilyData(sender, userData, true, false));
+                    familyDataRepository.save(new FamilyData(sender, userData, true, false, sender));
                 }
             }
             redirectAttributes.addFlashAttribute("username", userData.getEmail());
