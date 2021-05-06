@@ -46,10 +46,11 @@ public class PermissionService {
 
     public boolean doesUserHaveAdminRights(UserPermission permission) {
         switch (permission.getPermission()) {
-            case "master", "admin" -> {
+            case "master":
+            case "admin" : {
                 return true;
             }
-            default -> {
+            default: {
                 return false;
             }
         }

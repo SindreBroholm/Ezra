@@ -305,8 +305,14 @@ public class BoardController {
     * */
     private void handleMembershipRequest(UserRole role) {
         switch (role.getMembershipType().getPermission()) {
-            case "follower" -> role.setPendingMember(!role.isPendingMember());
-            case "visitor" -> role.setMembershipType(UserPermission.FOLLOWER);
+            case "follower":{
+                role.setPendingMember(!role.isPendingMember());
+                break;
+            }
+            case "visitor" :{
+                role.setMembershipType(UserPermission.FOLLOWER);
+                break;
+            }
         }
         userRoleRepository.save(role);
     }
@@ -317,7 +323,7 @@ public class BoardController {
     *  */
     private void updateBoardMemberPermission(Integer boardId, String value, UserData loggedInUser, UserRole memberUr) {
         switch (value) {
-            case "ADMIN", "MEMBER" -> {
+            case "ADMIN": case "MEMBER" : {
                 if (permissionService.doesUserHaveAdminRights(userRoleRepository.findByBoardIdAndUserId(boardId, loggedInUser.getId()).getMembershipType())) {
                     if (value.equals("ADMIN")) {
                         memberUr.setMembershipType(UserPermission.ADMIN);
@@ -327,8 +333,13 @@ public class BoardController {
                     }
                 }
             }
-            case "VISITOR" -> memberUr.setMembershipType(UserPermission.VISITOR);
-            default -> memberUr.setMembershipType(UserPermission.FOLLOWER);
+            case "VISITOR" :{
+                memberUr.setMembershipType(UserPermission.VISITOR);
+                break;
+            }
+            default :{
+                memberUr.setMembershipType(UserPermission.FOLLOWER);
+            }
         }
         memberUr.setPendingMember(false);
         userRoleRepository.save(memberUr);
