@@ -8,5 +8,5 @@ import java.util.Optional;
 public interface FamilyRequestRepository extends CrudRepository<FamilyRequest, Integer> {
 
     Optional<FamilyRequest> findByMemberEmail(String email);
-    Optional<FamilyRequest> findByUserIdAndMemberEmail(Integer userId, String email);
+
 }
