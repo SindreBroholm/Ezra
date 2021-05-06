@@ -27,7 +27,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                    .antMatchers("/css/loginPageStyle.css","/css/globalElements.css", "/js/notifications/dist/notifications.css","/img/EzraLogo.png","/js/notifications/dist/notifications.js", "/signup")
+                    .antMatchers("/css/loginPageStyle.css",
+                            "/css/globalElements.css", "/js/notifications/dist/notifications.css",
+                            "/img/EzraLogo.png","/js/notifications/dist/notifications.js",
+                            "/signup", "https://prodject-ezra-sbs.herokuapp.com/signup")
                 .permitAll()
                 .anyRequest()
                 .authenticated()
