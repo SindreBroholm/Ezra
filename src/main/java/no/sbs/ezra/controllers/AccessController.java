@@ -47,7 +47,7 @@ public class AccessController {
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
     public String createNewUser(@Valid @ModelAttribute("UserData") UserData userData, BindingResult br,
                                 RedirectAttributes redirectAttributes, Model model, Principal principal) {
-        UserDataValidator validation = new UserDataValidator(userDataRepository, principal);
+        UserDataValidator validation = new UserDataValidator(userDataRepository, principal, passwordEncoder);
         if (validation.supports(userData.getClass())) {
             validation.validate(userData, br);
         }

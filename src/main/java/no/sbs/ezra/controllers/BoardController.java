@@ -43,7 +43,7 @@ public class BoardController {
     @GetMapping("/board/{boardId}")
     public String getBoardPage(Model model, @PathVariable Integer boardId, Principal principal) {
         if (boardDataRepository.findById(boardId).isPresent()) {
-            UserData user = userDataRepository.findByEmail(principal.getName());
+            UserData user = userDataRepository.findByEmail(principal.getName()).get();
             BoardData board = boardDataRepository.findById(boardId).get();
             UserRole userRole = userRoleRepository.findByBoardIdAndUserId(board.getId(), user.getId());
             handleFirstTimeVisitor(board, user);
@@ -63,7 +63,7 @@ public class BoardController {
                                            @PathVariable(required = false) Integer eventId, Principal principal) {
         if (boardDataRepository.findById(boardId).isPresent()) {
             BoardData board = boardDataRepository.findById(boardId).get();
-            UserData user = userDataRepository.findByEmail(principal.getName());
+            UserData user = userDataRepository.findByEmail(principal.getName()).get();
             UserRole role = userRoleRepository.findByBoardIdAndUserId(board.getId(), user.getId());
             if (permissionService.doesUserHaveAdminRights(role.getMembershipType())) {
                 model.addAttribute("board", board);
@@ -79,7 +79,7 @@ public class BoardController {
     public String getBoardMembersPage(Model model, @PathVariable Integer boardId, Principal principal) {
         if (boardDataRepository.findById(boardId).isPresent()) {
             BoardData board = boardDataRepository.findById(boardId).get();
-            UserData user = userDataRepository.findByEmail(principal.getName());
+            UserData user = userDataRepository.findByEmail(principal.getName()).get();
             UserRole role = userRoleRepository.findByBoardIdAndUserId(board.getId(), user.getId());
             if (permissionService.doesUserHaveAdminRights(role.getMembershipType())) {
                 model.addAttribute("members", userRoleRepository.findAllByBoardIdAndMembershipTypeOrMembershipType(board.getId(), UserPermission.MEMBER, UserPermission.ADMIN));
@@ -96,7 +96,7 @@ public class BoardController {
     public String getEditBoardPage(Model model, @PathVariable Integer boardId, Principal principal) {
         if (boardDataRepository.findById(boardId).isPresent()) {
             BoardData board = boardDataRepository.findById(boardId).get();
-            UserData user = userDataRepository.findByEmail(principal.getName());
+            UserData user = userDataRepository.findByEmail(principal.getName()).get();
             UserRole role = userRoleRepository.findByBoardIdAndUserId(board.getId(), user.getId());
             if (role.getMembershipType() == UserPermission.MASTER) {
                 model.addAttribute("board", boardDataRepository.findById(boardId).get());
@@ -127,8 +127,8 @@ public class BoardController {
             BoardData board = boardDataRepository.findById(boardId).get();
             if (sendTo.matches("^(.+)@(.+)$")){
                 if (userDataRepository.findByEmail(sendTo) != null){
-                    UserData sender = userDataRepository.findByEmail(principal.getName());
-                    UserData invitedUser = userDataRepository.findByEmail(sendTo);
+                    UserData sender = userDataRepository.findByEmail(principal.getName()).get();
+                    UserData invitedUser = userDataRepository.findByEmail(sendTo).get();
                     if (boardId == sender.getMyBoardId()){
                         /*
                         * This makes it possible for a user to invite another user to their private board.
@@ -178,7 +178,7 @@ public class BoardController {
                     boardData.setPrivateBoard(true);
                 }
                 boardDataRepository.save(boardData);
-                userRoleRepository.save(new UserRole(userDataRepository.findByEmail(principal.getName()), boardData, UserPermission.MASTER, false));
+                userRoleRepository.save(new UserRole(userDataRepository.findByEmail(principal.getName()).get(), boardData, UserPermission.MASTER, false));
             }
         }
         return HOME_PAGE;
@@ -219,7 +219,7 @@ public class BoardController {
                                                @PathVariable Integer memberId, Principal principal) {
         if (boardDataRepository.findById(boardId).isPresent()) {
             if (userDataRepository.findById(memberId).isPresent()) {
-                UserData loggedInUser = userDataRepository.findByEmail(principal.getName());
+                UserData loggedInUser = userDataRepository.findByEmail(principal.getName()).get();
                 BoardData board = boardDataRepository.findById(boardId).get();
                 UserData member = userDataRepository.findById(memberId).get();
                 UserRole memberUr = userRoleRepository.findByBoardIdAndUserId(board.getId(), member.getId());
@@ -236,7 +236,7 @@ public class BoardController {
                                     @PathVariable Integer boardId, @PathVariable(required = false) Integer eventId,
                                     Principal principal, Model model) {
         if (boardDataRepository.findById(boardId).isPresent()) {
-            UserData user = userDataRepository.findByEmail(principal.getName());
+            UserData user = userDataRepository.findByEmail(principal.getName()).get();
             BoardData board = boardDataRepository.findById(boardId).get();
             UserRole role = userRoleRepository.findByBoardIdAndUserId(board.getId(), user.getId());
             eventData.setBoard(board);
@@ -262,7 +262,7 @@ public class BoardController {
     @RequestMapping(value = "/deleteEvent/{boardId}/{eventId}", method = RequestMethod.POST)
     public String deleteEvent(@PathVariable Integer boardId, @PathVariable Integer eventId, Principal principal) {
         if (boardDataRepository.findById(boardId).isPresent()) {
-            UserData user = userDataRepository.findByEmail(principal.getName());
+            UserData user = userDataRepository.findByEmail(principal.getName()).get();
             BoardData board = boardDataRepository.findById(boardId).get();
             UserRole role = userRoleRepository.findByBoardIdAndUserId(board.getId(), user.getId());
             if (permissionService.doesUserHaveAdminRights(role.getMembershipType())) {
@@ -278,7 +278,7 @@ public class BoardController {
     @RequestMapping(value = "/board/{boardId}/access", method = RequestMethod.POST)
     public String handleBoardMembershipRequests(@PathVariable Integer boardId, Principal principal) {
         if (boardDataRepository.findById(boardId).isPresent()) {
-            UserData user = userDataRepository.findByEmail(principal.getName());
+            UserData user = userDataRepository.findByEmail(principal.getName()).get();
             BoardData board = boardDataRepository.findById(boardId).get();
             UserRole role = userRoleRepository.findByBoardIdAndUserId(board.getId(), user.getId());
             handleMembershipRequest(role);
@@ -290,7 +290,7 @@ public class BoardController {
     public String unfollowBoard(@PathVariable Integer boardId, Principal principal) {
         if (boardDataRepository.findById(boardId).isPresent()) {
             BoardData board = boardDataRepository.findById(boardId).get();
-            UserData user = userDataRepository.findByEmail(principal.getName());
+            UserData user = userDataRepository.findByEmail(principal.getName()).get();
             UserRole ur = userRoleRepository.findByBoardIdAndUserId(board.getId(), user.getId());
             ur.setMembershipType(UserPermission.VISITOR);
             ur.setPendingMember(false);

@@ -4,6 +4,7 @@ import lombok.NonNull;
 import no.sbs.ezra.data.UserData;
 
 import no.sbs.ezra.data.repositories.UserDataRepository;
+import no.sbs.ezra.security.PasswordConfig;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
@@ -14,10 +15,12 @@ public class UserDataValidator implements Validator {
 
     private final UserDataRepository repository;
     private final Principal principal;
+    private final PasswordConfig encoder;
 
-    public UserDataValidator(UserDataRepository repository, Principal principal) {
+    public UserDataValidator(UserDataRepository repository, Principal principal, PasswordConfig encoder) {
         this.repository = repository;
         this.principal = principal;
+        this.encoder = encoder;
     }
 
     @Override
@@ -28,8 +31,12 @@ public class UserDataValidator implements Validator {
     @Override
     public void validate(@NonNull Object o, @NonNull Errors errors) {
         UserData user = (UserData) o;
-        if (repository.findByEmail(user.getEmail()) != null) {
-            if (repository.findByEmail(principal.getName()) != repository.findByEmail(user.getEmail())){
+        if (repository.findByEmail(user.getEmail()).isPresent()) {
+            if (principal != null){
+                if (!repository.findByEmail(user.getEmail()).equals(repository.findByEmail(principal.getName()))){
+                    errors.rejectValue("email", "email.error", "E-mail not available");
+                }
+            } else {
                 errors.rejectValue("email", "email.error", "E-mail not available");
             }
         }
@@ -51,7 +58,9 @@ public class UserDataValidator implements Validator {
 
 
         if (user.getPassword().length() < 6) {
-            errors.rejectValue("password", "password.error", "Password is to short");
+            if (principal == null){
+                errors.rejectValue("password", "password.error", "Password is to short");
+            }
         }
 
         if (user.getPassword().length() > 300) {

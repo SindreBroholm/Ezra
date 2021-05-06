@@ -37,7 +37,7 @@ public class FamilyController {
 
     @GetMapping("/")
     public String getMainPage(Model model, Principal principal, @ModelAttribute("message") String msg) {
-        UserData user = userDataRepository.findByEmail(principal.getName());
+        UserData user = userDataRepository.findByEmail(principal.getName()).get();
         List<UserData> myFamily = getMyFamily(user);
 
         model.addAttribute("allEvents", eventToJsonService.getAllEventsToUser(myFamily, user));
@@ -51,7 +51,7 @@ public class FamilyController {
     public String getFamilyPage(Model model, Principal principal,
                                 @ModelAttribute("errors") String errors) {
         if (userDataRepository.findByEmail(principal.getName()) != null) {
-            UserData user = userDataRepository.findByEmail(principal.getName());
+            UserData user = userDataRepository.findByEmail(principal.getName()).get();
             model.addAttribute("errors", errors.split(","));
             model.addAttribute("user", user);
             model.addAttribute("famPendingRequest", getPendingFamilyRequests(user));
@@ -64,11 +64,11 @@ public class FamilyController {
     public String editProfile(@Valid @ModelAttribute("user") UserData user, BindingResult br,
                               @RequestParam(name = "value") String password, Principal principal,
                               RedirectAttributes redirectAttributes) {
-        UserDataValidator validation = new UserDataValidator(userDataRepository, principal);
+        UserDataValidator validation = new UserDataValidator(userDataRepository, principal, passwordEncoder);
         if (validation.supports(user.getClass())) {
             validation.validate(user, br);
         }
-        UserData updateUser = userDataRepository.findByEmail(principal.getName());
+        UserData updateUser = userDataRepository.findByEmail(principal.getName()).get();
         if (br.hasErrors() || !passwordEncoder.passwordEncoder().matches(password, updateUser.getPassword())) {
             if (!passwordEncoder.passwordEncoder().matches(password, updateUser.getPassword())) {
                 br.addError(new ObjectError("user", "Password didn't match"));
@@ -85,7 +85,7 @@ public class FamilyController {
     public String acceptOrDeleteFamilyMember(@PathVariable Integer memberId, @RequestParam boolean value,
                                              Principal principal) {
         if (userDataRepository.findByEmail(principal.getName()) != null) {
-            UserData user = userDataRepository.findByEmail(principal.getName());
+            UserData user = userDataRepository.findByEmail(principal.getName()).get();
             if (userDataRepository.findById(memberId).isPresent()) {
                 UserData member = userDataRepository.findById(memberId).get();
                 acceptOrDeleteFamilyRequest(value, user, member);
@@ -129,9 +129,9 @@ public class FamilyController {
     public String sendFamilyMemberRequestByMail(@RequestParam String sendTo, Principal principal,
                                                 RedirectAttributes ra) {
         if (sendTo.matches("^(.+)@(.+)$")) {
-            UserData sender = userDataRepository.findByEmail(principal.getName());
+            UserData sender = userDataRepository.findByEmail(principal.getName()).get();
             if (userDataRepository.findByEmail(sendTo) != null) {
-                UserData isAlreadyUser = userDataRepository.findByEmail(sendTo);
+                UserData isAlreadyUser = userDataRepository.findByEmail(sendTo).get();
                 familyRequestRepository.save(new FamilyRequest(sender, sendTo, true));
                 familyDataRepository.save(new FamilyData(sender, isAlreadyUser, true, false, sender));
             } else {

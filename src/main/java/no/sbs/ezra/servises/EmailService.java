@@ -23,7 +23,7 @@ public class EmailService {
     }
 
     public void sendEmailInviteToBoard(String toUser, Principal principal, BoardData board){
-        UserData fromUser = userDataRepository.findByEmail(principal.getName());
+        UserData fromUser = userDataRepository.findByEmail(principal.getName()).get();
         String name = fromUser.getFirstname() + " " + fromUser.getLastname();
         String body = String.format("%s invited you to follow %s,\n http://localhost:8080/board/%d", name, board.getName(), board.getId());
         String topic = String.format("%s invites you to %s", name, board.getName());
@@ -40,7 +40,7 @@ public class EmailService {
     }
 
     public void sendFamilyMemberRequest(String sendTo, Principal principal) {
-        UserData fromUser = userDataRepository.findByEmail(principal.getName());
+        UserData fromUser = userDataRepository.findByEmail(principal.getName()).get();
         String name = fromUser.getFirstname() + " " + fromUser.getLastname();
         String body = String.format("%s says you are family and would like you to sync your calenders.\n" +
                 "Go to this link to accept or register with your email first.\n" +
