@@ -51,9 +51,7 @@ public class UserDataValidator implements Validator {
 
 
         if (user.getPassword().length() < 6) {
-            if (repository.findByEmail(principal.getName()) != repository.findByEmail(user.getEmail())){
-                errors.rejectValue("password", "password.error", "Password is to short");
-            }
+            errors.rejectValue("password", "password.error", "Password is to short");
         }
 
         if (user.getPassword().length() > 300) {
