@@ -109,7 +109,7 @@ public class BoardController {
 
     @GetMapping("/createBoard")
     public String getCreateBoardPage(Model model, Principal principal) {
-        model.addAttribute("user", userDataRepository.findByEmail(principal.getName()));
+        model.addAttribute("user", userDataRepository.findByEmail(principal.getName()).get());
         model.addAttribute("BoardData", new BoardData());
         model.addAttribute("errors", new ArrayList<>());
         return "createNewBoardPage";
@@ -126,7 +126,7 @@ public class BoardController {
         if (boardDataRepository.findById(boardId).isPresent()){
             BoardData board = boardDataRepository.findById(boardId).get();
             if (sendTo.matches("^(.+)@(.+)$")){
-                if (userDataRepository.findByEmail(sendTo) != null){
+                if (userDataRepository.findByEmail(sendTo).isPresent()){
                     UserData sender = userDataRepository.findByEmail(principal.getName()).get();
                     UserData invitedUser = userDataRepository.findByEmail(sendTo).get();
                     if (boardId == sender.getMyBoardId()){
@@ -167,7 +167,7 @@ public class BoardController {
                                  Principal principal, Model model,
                                  @RequestParam( name = "isPrivate", required = false) boolean isPrivate) {
         BoardDataValidator validator = new BoardDataValidator();
-        model.addAttribute("user", userDataRepository.findByEmail(principal.getName()));
+        model.addAttribute("user", userDataRepository.findByEmail(principal.getName()).get());
         if (validator.supports(boardData.getClass())) {
             validator.validate(boardData, br);
             if (br.hasErrors()) {

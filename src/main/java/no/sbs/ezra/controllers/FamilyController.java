@@ -50,7 +50,7 @@ public class FamilyController {
     @GetMapping("/family")
     public String getFamilyPage(Model model, Principal principal,
                                 @ModelAttribute("errors") String errors) {
-        if (userDataRepository.findByEmail(principal.getName()) != null) {
+        if (userDataRepository.findByEmail(principal.getName()).isPresent()) {
             UserData user = userDataRepository.findByEmail(principal.getName()).get();
             model.addAttribute("errors", errors.split(","));
             model.addAttribute("user", user);
