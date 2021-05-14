@@ -25,7 +25,7 @@ public class EmailService {
     public void sendEmailInviteToBoard(String toUser, Principal principal, BoardData board){
         UserData fromUser = userDataRepository.findByEmail(principal.getName()).get();
         String name = fromUser.getFirstname() + " " + fromUser.getLastname();
-        String body = String.format("%s invited you to follow %s,\n http://localhost:8080/board/%d", name, board.getName(), board.getId());
+        String body = String.format("%s invited you to follow %s,\n https://prodject-ezra-sbs.herokuapp.com/board/%d", name, board.getName(), board.getId());
         String topic = String.format("%s invites you to %s", name, board.getName());
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
         simpleMailMessage.setFrom("prodject.ezra@gmail.com");
@@ -44,7 +44,7 @@ public class EmailService {
         String name = fromUser.getFirstname() + " " + fromUser.getLastname();
         String body = String.format("%s says you are family and would like you to sync your calenders.\n" +
                 "Go to this link to accept or register with your email first.\n" +
-                "http://localhost:8080/family", name);
+                "https://prodject-ezra-sbs.herokuapp.com/family", name);
         String topic = String.format("Family member request from %s", name);
 
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
