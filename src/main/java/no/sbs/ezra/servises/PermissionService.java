@@ -36,6 +36,7 @@ public class PermissionService {
         }
         if (!events.isEmpty()) {
             events.removeIf(e -> e.getDatetime_to().isBefore(LocalDateTime.now()));
+
             events.sort(
                     Comparator.comparing(EventData::getDatetime_from)
                             .thenComparing(EventData::getDatetime_to)
