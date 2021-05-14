@@ -14,6 +14,7 @@ import no.sbs.ezra.data.validators.EventDataValidator;
 import no.sbs.ezra.security.UserPermission;
 import no.sbs.ezra.servises.EmailService;
 import no.sbs.ezra.servises.PermissionService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -23,7 +24,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import static no.sbs.ezra.constants.Constants.*;
 
@@ -115,7 +118,6 @@ public class BoardController {
         return "createNewBoardPage";
     }
 
-
     /*
     * When notification gets implemented this need to be fixed !!
     * --For now only sends invite if sentTO is not a user jet or never have visited the board.
@@ -200,6 +202,8 @@ public class BoardController {
                 } else {
                     if (value.length() == 6) {
                         if (value.equals("DELETE")) {
+                            List<EventData> events = eventDataRepository.findAllByBoardId(boardId);
+                            eventDataRepository.deleteAll(events);
                             boardDataRepository.delete(boardDataRepository.findById(boardId).get());
                             redirectAttributes.addFlashAttribute("message","Board successfully deleted!");
                             return HOME_PAGE;

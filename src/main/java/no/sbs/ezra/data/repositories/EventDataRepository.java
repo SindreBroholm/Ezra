@@ -10,4 +10,5 @@ public interface EventDataRepository extends CrudRepository<EventData, Integer> 
 
     List<EventData> findAllByBoardIdAndAndMembershipType(int boardDataId, UserPermission membershipType);
 
+    List<EventData> findAllByBoardId(Integer boardId);
 }

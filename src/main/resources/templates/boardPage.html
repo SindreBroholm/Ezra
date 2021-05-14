@@ -131,12 +131,15 @@
                             </div>
                             <div class="toggle" style="display: none;">
                                 <div class="alterEventBox">
-                                    <a class="link"
-                                       th:href="@{'/createEvent/' + ${board.id} + '/' + ${event.id}}">Edit</a>
-                                    <form class="mlmlml" th:action="@{'/deleteEvent/' + *{board.id} + '/' + *{id}}"
-                                          method="post">
-                                        <button class="delete link">Delete</button>
-                                    </form>
+                                    <div th:if="${userPermission.membershipType.getPermission().equals('master')
+                                    || userPermission.membershipType.getPermission().equals('admin') }">
+                                        <a class="link"
+                                           th:href="@{'/createEvent/' + ${board.id} + '/' + ${event.id}}">Edit</a>
+                                        <form class="mlmlml" th:action="@{'/deleteEvent/' + *{board.id} + '/' + *{id}}"
+                                              method="post">
+                                            <button class="delete link">Delete</button>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -240,7 +243,6 @@
         showEventInfoNode.innerHTML = displayEvent(events[id - 1])
         let divNode = document.getElementById(id);
         let formNode = divNode.lastElementChild;
-
         if (formNode.style.display === 'none') {
             formNode.style.display = 'block';
         } else {
