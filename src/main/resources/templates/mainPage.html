@@ -4,52 +4,57 @@
     <meta charset="UTF-8">
     <meta name="author" content="Sindre Broholm Sæther">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link th:href="@{/css/headerFragment.css}" rel="stylesheet"/>
+    <link th:href="@{/css/headerF.css}" rel="stylesheet"/>
     <link th:href="@{/css/mainPageStyles.css}" rel="stylesheet"/>
     <link th:href="@{/js/notifications/dist/notifications.css}" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
-          rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.5.1/main.css" rel="stylesheet"/>
+    <link th:href="@{/js/fullcalendar/lib/main.css}" rel="stylesheet"/>
+    <link th:href="@{/js/bootstrap/css/bootstrap.css}" rel="stylesheet"/>
+    <link th:href="@{/js/fontawesome/css/all.css}" rel="stylesheet"/>
     <title>Ezra</title>
 </head>
 <body>
-<header th:replace="fragments/headerFragment :: header"></header>
-<article id="main-grid-container">
-    <section class="leftOfMain div">
-        <h1 class="textCenter">Boards</h1>
-        <div class="div eventVariableInfoBox " th:each="ur: ${UserRoles}">
-            <a th:href="@{'/board/' + ${ur.board.id}}">
-                <div class="div variableField border">
-                    <span class="eventInfoInput" th:text="${ur.board.name}"></span>
+<header th:replace="fragments/headerF :: header"></header>
+
+
+    <div class="container mt-6">
+        <div class="row">
+            <div class="col leftOfMain">
+                <h1 class="text-center mb-3">Boards</h1>
+                <div class="container">
+                    <div th:each="ur: ${UserRoles}" class="row mb-2">
+                        <a th:href="@{'/board/' + ${ur.board.id}}" class="btn btn-outline-light col-12 text-wrap" th:text="${ur.board.name}"></a>
+                    </div>
                 </div>
-            </a>
+
+            </div>
+            <div class="col-7 main">
+                <div id="calendar"></div>
+            </div>
+            <div class="col" id="rightOfMain"></div>
         </div>
-    </section>
-    <main class="main">
-        <div id='calendar'></div>
-    </main>
-    <section id="rightOfMain" class="div"></section>
-</article>
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.5.1/main.min.js"></script>
+    </div>
+
+<script th:src="@{/js/fullcalendar/lib/main.js}"></script>
 <script th:src="@{/js/notifications/dist/notifications.js}"></script>
 <script th:inline="javascript">
     /*<![CDATA[*/
     const messageNoty = /*[[${msg}]]*/ "";
 
-    if (messageNoty !== ""){
-    function myNotify() {
-        const notify =  window.createNotification({
-            positionClass: 'nfc-top-right',
-            displayCloseButton: false,
-            onclick: true,
-            showDuration: 35000,
-            theme: 'success'
-        });
-        notify({
-            title:'Message',
-            message: messageNoty.toString()
-        })
-    }
+    if (messageNoty !== "") {
+        function myNotify() {
+            const notify = window.createNotification({
+                positionClass: 'nfc-top-right',
+                displayCloseButton: false,
+                onclick: true,
+                showDuration: 35000,
+                theme: 'success'
+            });
+            notify({
+                title: 'Message',
+                message: messageNoty.toString()
+            })
+        }
+
         myNotify();
     }
     document.addEventListener('DOMContentLoaded', function () {
@@ -86,56 +91,71 @@
                 minute: '2-digit',
             })
             return `
-            <div class="div" id="eventSection">
-            <div class="div" id="eventBox">
-                <div class="div logoImg">
-                    <h2>${event.extendedProps.boardName}</h2>
+ <div id="eventSection">
+    <div class="p-2 border" id="eventBox">
+        <div>
+            <p class="text-center fs-2 text-wrap">${event.extendedProps.boardName}</p>
+        </div>
+        <div class="border" id="eventInfoBox">
+            <div  class="d-flex flex-column bd-highlight p-2" id="eventInfoElements">
+                    <figure class="m-0">
+                        <blockquote class="blockquote">
+                            <p>${event.title}</p>
+                        </blockquote>
+                        <figcaption class="blockquote-footer mb-2">
+                            EVENT
+                        </figcaption>
+                    </figure>
+
+                    <figure class="m-0">
+                        <blockquote class="blockquote">
+                            <p>${eventStart}</p>
+                        </blockquote>
+                        <figcaption class="blockquote-footer mb-2">
+                            STARTS
+                        </figcaption>
+                    </figure>
+
+                    <figure class="m-0">
+                        <blockquote class="blockquote">
+                            <p>${eventEnd}</p>
+                        </blockquote>
+                        <figcaption class="blockquote-footer mb-2">
+                            ENDS
+                        </figcaption>
+                    </figure>
+
+                    <figure class="m-0">
+                        <blockquote class="blockquote">
+                            <p>${event.extendedProps.location}</p>
+                        </blockquote>
+                        <figcaption class="blockquote-footer mb-2">
+                            LOCATION
+                        </figcaption>
+                    </figure class="m-0">
+                <div id="isAttendingMissing">
+                    <figure class="m-0">
+                        <blockquote class="blockquote">
+                            <p>${event.extendedProps.familyMember}</p>
+                        </blockquote>
+                        <figcaption class="blockquote-footer mb-2">
+                            ATTENDING
+                        </figcaption>
+                    </figure>
                 </div>
-                <div class="div" id="eventInfoBox">
-                    <div  class="div" id="eventInfoElements">
-                        <div class="eventVariableInfoBox div">
-                            <div class="variableField div">
-                                <span class="infoField">Event</span>
-                                <span class="eventInfoInput">${event.title}</span>
-                            </div>
-                        </div>
-                        <div class="eventVariableInfoBox div">
-                            <div class="variableField div">
-                                <span class="infoField">From</span>
-                                <span class="eventInfoInput">${eventStart}</span>
-                            </div>
-                        </div>
-                        <div class="eventVariableInfoBox div">
-                            <div class="variableField div">
-                                <span class="infoField">To</span>
-                                <span class="eventInfoInput">${eventEnd}</span>
-                            </div>
-                        </div>
-                        <div class="eventVariableInfoBox div">
-                            <div class="variableField div">
-                                <span class="infoField">Location</span>
-                                <span class="eventInfoInput">${event.extendedProps.location}</span>
-                            </div>
-                        </div>
-                        <div class="eventVariableInfoBox div">
-                            <div class="variableField div">
-                                <span class="infoField">Info/Description</span>
-                                <span class="eventInfoInput">${event.extendedProps.description}</span>
-                            </div>
-                        </div>
-                        <div id="isAttendingMissing">
-                            <div className="eventVariableInfoBox div">
-                                <div className="variableField div">
-                                    <span className="infoField">Attending</span><br>
-                                    <span className="eventInfoInput">${event.extendedProps.familyMember}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                    <figure class="m-0">
+                        <blockquote class="blockquote">
+                            <p class="text-break">${event.extendedProps.description}</p>
+                        </blockquote>
+                        <figcaption class="blockquote-footer mb-2">
+                            INFO
+                        </figcaption>
+                    </figure>
             </div>
-        </div>`
-        }
+        </div>
+    </div>
+ </div>
+`}
 
         function showEvents(event) {
             let getDateStat = event.start
@@ -152,72 +172,76 @@
                     minute: '2-digit',
                 })
             }
-        return `
-                <div class="div" id="eventInfoBox">
-                    <div  class="div" id="eventInfoElements">
-                        <div class="eventVariableInfoBox div">
-                            <div class="variableField div">
-                                <span class="infoField">${event.boardName}</span>
-                                <span class="eventInfoInput">${event.title}</span>
-                            </div>
-                        </div>
-                        <div class="eventVariableInfoBox div">
-                            <div class="variableField div">
-                                <div class="timeInfoBox">
-                                    <span class="eventInfoInput">${sliceStartDate}</span>
-                                    <span class="infoField">-</span>
-                                    <span class="eventInfoInput">${sliceEndDate}</span>
-                                </div>
-
-                                <div class="isFamilyMemberMissing">
-                                    <span class="infoField">Attending</span><br>
-                                    <span class="eventInfoInput">${event.familyMember}</span>
-                                </div>
-                            </div>
-                        </div>
+            return `
+                <div class="container border m-1">
+                    <div  class="d-flex flex-column bd-highlight mb-3" id="eventInfoElements">
+                        <figure>
+                            <blockquote class="blockquote">
+                               <p class="text-break">${event.title}</p>
+                            </blockquote>
+                            <figcaption class="blockquote-footer">
+                                ${event.boardName}
+                             </figcaption>
+                        </figure>
+                        <figure>
+                            <blockquote class="blockquote">
+                               <p class="text-break">${sliceStartDate} - ${sliceEndDate}</p>
+                            </blockquote>
+                            <figcaption class="blockquote-footer">
+                                STARTS - ENDS
+                             </figcaption>
+                        </figure>
+                        <figure>
+                            <blockquote class="blockquote">
+                               <p class="text-break">${event.familyMember}</p>
+                            </blockquote>
+                            <figcaption class="blockquote-footer">
+                                ATTENDING
+                             </figcaption>
+                        </figure>
                     </div>
                 </div>
-                `
-    }
+                `}
 
-    const calendar = new FullCalendar.Calendar(calendarEl, {
-        eventClick: function (info) {
-            let eventObj = info.event;
-            rightSection.innerHTML = showEvent(eventObj);
-        },
-        dateClick: function (info) {
-            let today = new Date(Date.parse(info.dateStr)).toLocaleDateString(undefined, {
-                weekday: 'long',
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric',
-            })
-            let eventsThisDay = [];
-            let tempHTML = today.toString();
-            eventArray.forEach(value => {
-                let getDate = value.start
-                let sliceDate = getDate.slice(0, 10)
-                if (sliceDate === info.dateStr) {
-                    console.log(value);
-                    eventsThisDay.push(value);
-                    tempHTML += showEvents(value);
-                }
-            })
-            rightSection.innerHTML = tempHTML;
-        },
-        headerToolbar: {center: 'dayGridMonth,dayGridWeek,dayGridDay'},
-        initialView: 'dayGridMonth',
-        nextDayThreshold: '00:00:00',
-        firstDay: 1,
-        eventTimeFormat: { // like '14:30'
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false
-        },
-        events: eventArray,
-        /*eventColor: '#1D9F91'*/
-    });
-    calendar.render();
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            eventClick: function (info) {
+                let eventObj = info.event;
+                rightSection.innerHTML = showEvent(eventObj);
+            },
+            dateClick: function (info) {
+                let today = new Date(Date.parse(info.dateStr)).toLocaleDateString(undefined, {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                })
+                let eventsThisDay = [];
+                let tempHTML = today.toString();
+                eventArray.forEach(value => {
+                    let getDate = value.start
+                    let sliceDate = getDate.slice(0, 10)
+                    if (sliceDate === info.dateStr) {
+                        console.log(value);
+                        eventsThisDay.push(value);
+                        tempHTML += showEvents(value);
+                    }
+                })
+                rightSection.innerHTML = tempHTML;
+            },
+            weekNumbers: true,
+            dayMaxEvents: true,
+            headerToolbar: {center: 'dayGridMonth,dayGridWeek,dayGridDay'},
+            initialView: 'dayGridMonth',
+            nextDayThreshold: '00:00:00',
+            firstDay: 1,
+            eventTimeFormat: { // like '14:30'
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            },
+            events: eventArray,
+        });
+        calendar.render();
     })
     ;
 

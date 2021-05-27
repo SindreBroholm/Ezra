@@ -1,110 +1,41 @@
-#main-grid-container {
-    display: grid;
-    grid-template-columns: 0.5fr 1fr 0.5fr;
-    grid-template-rows: 1.8fr 0.2fr;
-    gap: 0px 0px;
-    grid-template-areas:
-    "left main right"
-    ". . .";
-}
 
+body{
+    background-color: #031c24;
+    background-image: linear-gradient(135deg, #031c24 0%, #434747 100%);
+    min-height: 110vh;
+}
 .main{
-    grid-area: main;
-    max-width: 100%;
+    width: 100%;
     margin-top: 50px;
+    color: #fff;
 }
 .leftOfMain{
-    margin-top: 50px;
-    grid-area: left;
     width: 100%;
+    color: #fff;
 }
-#rightOfMain{
-    margin-top: 50px;
-    grid-area: right;
-    width: 100%;
-    justify-content: center;
-    align-items: center;
-}
-#eventSection {
-    -webkit-box-flex: 1;
-    flex-grow: 1;
-    -webkit-box-pack: center;
-    justify-content: center;
-    width: 100%;
-    padding: 0 30px;
 
+#rightOfMain{
+    width: 100%;
+    justify-content: start;
+    align-items: center;
+    color: #fff;
+}
+
+#eventSection {
+    width: 100%;
 }
 
 #eventBox {
-    -webkit-box-align: center;
-    align-items: center;
-    border: 1px solid black;
-    border-radius: 1px;
-    padding: 10px 20px;
+    width: 100%;
 }
 
-#eventInfoBox {
-    max-width: 100%;
-    min-width: 300px;
-    padding: 12px 0;
-    border: 1px solid black;
-    justify-content: center;
-    align-items: center;
-    margin: 10px 0;
-}
-
-
-#eventInfoElements {
-    margin-top: 0;
-    -webkit-box-flex: 0;
-    flex: 0 0 auto;
-    -webkit-box-pack: start;
-    justify-content: flex-start;
-    -webkit-box-align: stretch;
-    align-items: stretch;
-    align-content: stretch;
-    padding: 5px 0;
-}
-.eventVariableInfoBox{
-    margin: 5px 0;
-}
-
-.variableField {
-    font-size: 14px;
-    color: gray;
-}
-
-.eventInfoInput {
-    font-size: 18px;
-    font-weight: normal;
-    color: black;
-    margin-left: 5px;
-    margin-top: 5px;
-    white-space: pre-wrap;
-}
-.div{
-    -webkit-box-align: stretch;
-    -webkit-align-items: stretch;
-    align-items: stretch;
-    border: 0 solid #000;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    display: flex;
-    -webkit-box-orient: vertical;
-    -webkit-box-direction: normal;
-    flex-direction: column;
-    padding: 0;
-    position: relative;
-}
-.textCenter {
-    text-align: center;
-    font-size: 2em;
-}
 a{
     text-decoration: none;
+    color: black;
 }
-.border{
-    border: 1px solid black;
-    padding: 10px;
-    margin: 5px 20px
-}
+figure{
+    display: block;
+    margin: 0;
+}.mt-6 {
+     margin-top: 150px;
+ }

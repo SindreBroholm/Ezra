@@ -37,13 +37,15 @@ public class FamilyController {
 
     @GetMapping("/")
     public String getMainPage(Model model, Principal principal, @ModelAttribute("message") String msg) {
-        UserData user = userDataRepository.findByEmail(principal.getName()).get();
-        List<UserData> myFamily = getMyFamily(user);
+        if (userDataRepository.findByEmail(principal.getName()).isPresent()) {
+            UserData user = userDataRepository.findByEmail(principal.getName()).get();
+            List<UserData> myFamily = getMyFamily(user);
 
-        model.addAttribute("allEvents", eventToJsonService.getAllEventsToUser(myFamily, user));
-        model.addAttribute("familyEvents", eventToJsonService.getAllEventsToUsersFamilyMembers(myFamily, user));
-        model.addAttribute("UserRoles", userRoleRepository.findAllByUserIdAndMembershipTypeIsNot(user.getId(), UserPermission.VISITOR));
-        model.addAttribute("msg", msg);
+            model.addAttribute("allEvents", eventToJsonService.getAllEventsToUser(myFamily, user));
+            model.addAttribute("familyEvents", eventToJsonService.getAllEventsToUsersFamilyMembers(myFamily, user));
+            model.addAttribute("UserRoles", userRoleRepository.findAllByUserIdAndMembershipTypeIsNot(user.getId(), UserPermission.VISITOR));
+            model.addAttribute("msg", msg);
+        }
         return "mainPage";
     }
 
@@ -68,15 +70,17 @@ public class FamilyController {
         if (validation.supports(user.getClass())) {
             validation.validate(user, br);
         }
-        UserData updateUser = userDataRepository.findByEmail(principal.getName()).get();
-        if (br.hasErrors() || !passwordEncoder.passwordEncoder().matches(password, updateUser.getPassword())) {
-            if (!passwordEncoder.passwordEncoder().matches(password, updateUser.getPassword())) {
-                br.addError(new ObjectError("user", "Password didn't match"));
+        if (userDataRepository.findByEmail(principal.getName()).isPresent()) {
+            UserData updateUser = userDataRepository.findByEmail(principal.getName()).get();
+            if (br.hasErrors() || !passwordEncoder.passwordEncoder().matches(password, updateUser.getPassword())) {
+                if (!passwordEncoder.passwordEncoder().matches(password, updateUser.getPassword())) {
+                    br.addError(new ObjectError("user", "Password didn't match"));
+                }
+                redirectAttributes.addFlashAttribute("errors", getErrorMessages(br));
+                return FAMILY_PAGE;
+            } else {
+                updateUser(user, updateUser);
             }
-            redirectAttributes.addFlashAttribute("errors", getErrorMessages(br));
-            return FAMILY_PAGE;
-        } else {
-            updateUser(user, updateUser);
         }
         return FAMILY_PAGE;
     }
@@ -84,7 +88,7 @@ public class FamilyController {
     @RequestMapping(value = "/family/{memberId}", method = RequestMethod.POST)
     public String acceptOrDeleteFamilyMember(@PathVariable Integer memberId, @RequestParam boolean value,
                                              Principal principal) {
-        if (userDataRepository.findByEmail(principal.getName()) != null) {
+        if (userDataRepository.findByEmail(principal.getName()).isPresent()) {
             UserData user = userDataRepository.findByEmail(principal.getName()).get();
             if (userDataRepository.findById(memberId).isPresent()) {
                 UserData member = userDataRepository.findById(memberId).get();
@@ -102,8 +106,8 @@ public class FamilyController {
             familyDataRepository.save(familyData);
             setUserRoleToAdminForFamilyMembersPrivateBoard(user, member);
         }
-        if (!value){
-            if (boardDataRepository.findById(member.getMyBoardId()).isPresent()){
+        if (!value) {
+            if (boardDataRepository.findById(member.getMyBoardId()).isPresent()) {
                 BoardData memberBoard = boardDataRepository.findById(member.getMyBoardId()).get();
                 UserRole userToMemberRole = userRoleRepository.findByBoardIdAndUserId(memberBoard.getId(), user.getId());
                 UserRole memberToUserRole = userRoleRepository.findByBoardIdAndUserId(user.getMyBoardId(), member.getId());
@@ -115,10 +119,10 @@ public class FamilyController {
     }
 
     private void setUserRoleToAdminForFamilyMembersPrivateBoard(UserData user, UserData member) {
-        if (boardDataRepository.findById(user.getMyBoardId()).isPresent()){
+        if (boardDataRepository.findById(user.getMyBoardId()).isPresent()) {
             BoardData privateBoard = boardDataRepository.findById(user.getMyBoardId()).get();
             userRoleRepository.save(new UserRole(member, privateBoard, UserPermission.ADMIN, false));
-            if (boardDataRepository.findById(member.getMyBoardId()).isPresent()){
+            if (boardDataRepository.findById(member.getMyBoardId()).isPresent()) {
                 BoardData famMemberPrivateBoard = boardDataRepository.findById(member.getMyBoardId()).get();
                 userRoleRepository.save(new UserRole(user, famMemberPrivateBoard, UserPermission.ADMIN, false));
             }
@@ -129,21 +133,22 @@ public class FamilyController {
     public String sendFamilyMemberRequestByMail(@RequestParam String sendTo, Principal principal,
                                                 RedirectAttributes ra) {
         if (sendTo.matches("^(.+)@(.+)$")) {
-            UserData sender = userDataRepository.findByEmail(principal.getName()).get();
-            if (userDataRepository.findByEmail(sendTo) != null) {
-                UserData isAlreadyUser = userDataRepository.findByEmail(sendTo).get();
-                familyRequestRepository.save(new FamilyRequest(sender, sendTo, true));
-                familyDataRepository.save(new FamilyData(sender, isAlreadyUser, true, false, sender));
+            if (userDataRepository.findByEmail(principal.getName()).isPresent()) {
+                UserData sender = userDataRepository.findByEmail(principal.getName()).get();
+                if (userDataRepository.findByEmail(sendTo).isPresent()) {
+                    UserData isAlreadyUser = userDataRepository.findByEmail(sendTo).get();
+                    familyRequestRepository.save(new FamilyRequest(sender, sendTo, true));
+                    familyDataRepository.save(new FamilyData(sender, isAlreadyUser, true, false, sender));
+                } else {
+                    emailService.sendFamilyMemberRequest(sendTo, principal);
+                    familyRequestRepository.save(new FamilyRequest(sender, sendTo, false));
+                }
             } else {
-                emailService.sendFamilyMemberRequest(sendTo, principal);
-                familyRequestRepository.save(new FamilyRequest(sender, sendTo, false));
+                ra.addFlashAttribute("errors", "Not a valid Email");
             }
-        } else {
-            ra.addFlashAttribute("errors", "Not a valid Email");
         }
         return FAMILY_PAGE;
     }
-
 
     private String getFamilyId(UserData user, UserData member) {
         /*
@@ -165,7 +170,7 @@ public class FamilyController {
         List<UserData> temp = new ArrayList<>();
         for (FamilyData fd :
                 pendingFamilyRequests) {
-            if (fd.isPendingRequest() && fd.getRequestedBy() != user){
+            if (fd.isPendingRequest() && fd.getRequestedBy() != user) {
                 if (fd.getUserOne() == user) {
                     temp.add(fd.getUserTwo());
                 } else {
@@ -181,7 +186,7 @@ public class FamilyController {
         List<UserData> temp = new ArrayList<>();
         for (FamilyData fd :
                 famMembers) {
-            if(fd.isAreFamily()){
+            if (fd.isAreFamily()) {
                 if (fd.getUserOne() == user) {
                     temp.add(fd.getUserTwo());
                 } else {
@@ -194,9 +199,9 @@ public class FamilyController {
 
     private void updateUser(UserData user, UserData updateUser) {
         /*
-        * There is no way for user to know if the password is accepted..
-        * implement notification!
-        * */
+         * There is no way for user to know if the password is accepted..
+         * implement notification!
+         * */
         if (user.getPassword().length() > 6 && user.getPassword().length() < 300) {
             updateUser.setEmail(user.getEmail());
             updateUser.setFirstname(user.getFirstname());
