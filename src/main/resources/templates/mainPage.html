@@ -17,20 +17,11 @@
 
 
     <div class="container mt-6">
-        <div class="row">
-            <div class="col leftOfMain">
-                <h1 class="text-center mb-3">Boards</h1>
-                <div class="container">
-                    <div th:each="ur: ${UserRoles}" class="row mb-2">
-                        <a th:href="@{'/board/' + ${ur.board.id}}" class="btn btn-outline-light col-12 text-wrap" th:text="${ur.board.name}"></a>
-                    </div>
-                </div>
-
-            </div>
-            <div class="col-7 main">
+        <div class="row justify-content-center col-sm-12">
+            <div class="col-lg-8 main col-md-12 col-sm-12">
                 <div id="calendar"></div>
             </div>
-            <div class="col" id="rightOfMain"></div>
+            <div class="col-lg-2 col-md-12 col-sm-12 mt-4" id="rightOfMain"></div>
         </div>
     </div>
 
@@ -203,6 +194,7 @@
                 </div>
                 `}
 
+
         const calendar = new FullCalendar.Calendar(calendarEl, {
             eventClick: function (info) {
                 let eventObj = info.event;
@@ -228,9 +220,44 @@
                 })
                 rightSection.innerHTML = tempHTML;
             },
+            windowResize: function (arg){
+                if (window.innerWidth <= 768){
+                    /*    PHONES   */
+                    calendar.setOption('aspectRatio', 0.70)
+                    calendar.setOption('headerToolbar',
+                        {
+                            left: 'title',
+                            center: 'dayGridMonth,dayGridWeek,dayGridDay',
+                            right: 'prev,next'
+                        })
+                }else if (window.innerWidth <= 992){
+                    /*    TABLETS    */
+                    calendar.setOption('aspectRatio', 0.80)
+                    calendar.setOption('headerToolbar',
+                        {
+                            left: 'title',
+                            center: 'dayGridMonth,dayGridWeek,dayGridDay',
+                            right: 'prev,today,next'
+                        })
+                } else {
+                    /*    DESKTOP   */
+                    calendar.setOption('aspectRatio', 1.15)
+                    calendar.setOption('headerToolbar',
+                        {
+                            left: 'title',
+                            center: 'dayGridMonth,dayGridWeek,dayGridDay',
+                            right: 'prev,today,next'
+                        })
+                }
+            },
             weekNumbers: true,
             dayMaxEvents: true,
-            headerToolbar: {center: 'dayGridMonth,dayGridWeek,dayGridDay'},
+            themeSystem: 'Cyborg',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,dayGridWeek,dayGridDay'
+            },
             initialView: 'dayGridMonth',
             nextDayThreshold: '00:00:00',
             firstDay: 1,

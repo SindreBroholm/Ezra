@@ -7,9 +7,15 @@
           <!--<a href="#" class="navbar-brand text-uppercase font-weight-bold">Ezra</a>-->
           <img th:src="@{/img/EzraLogo.png}" alt="Logo" class="img-fluid" height="50" width="100"/>
         </div>
-
-        <button type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler navbar-toggler-right"><i class="fa fa-bars"></i></button>
-
+        <button type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+                class="navbar-toggler navbar-toggler-right">
+          <i class="fa fa-bars"></i>
+        </button>
         <div id="navbarSupportedContent" class="collapse navbar-collapse col-7 justify-content-center">
           <ul class="navbar-nav ml-auto">
             <li class="nav-item active"><a th:href="@{/}" class="nav-link text-uppercase font-weight-bold">Home <span class="sr-only">(current)</span></a></li>
@@ -17,14 +23,26 @@
             <li class="nav-item"><a th:href="@{/createBoard}" class="nav-link text-uppercase font-weight-bold">Create board</a></li>
             <li class="nav-item"><a th:href="@{/family}" class="nav-link text-uppercase font-weight-bold">Family</a></li>
             <li class="nav-item"><a th:href="@{/about}" class="nav-link text-uppercase font-weight-bold">About</a></li>
-            <li class="nav-item">
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle"
+                 href="#"
+                 id="navbarDropdown"
+                 role="button"
+                 data-bs-toggle="dropdown"
+                 aria-expanded="false">Boards</a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown" >
+                <li th:each="ur: ${UserRoles}">
+                  <a th:href="@{'/board/' + ${ur.board.id}}" class="dropdown-item" th:text="${ur.board.name}"></a>
+                </li>
+              </ul>
             </li>
           </ul>
-        </div>
-        <div class="col-2 justify-content-end">
-          <form th:action="@{/logout}" method="post" class="d-flex">
-            <button type="submit" class="btn btn-outline-secondary">Logout</button>
-          </form>
+
+          <div class="col-md-3 offset-md-3" id="logoutForm">
+            <form th:action="@{/logout}" method="post" class="d-flex">
+              <button type="submit" class="btn btn-outline-secondary">Logout</button>
+            </form>
+          </div>
         </div>
       </div>
     </nav>

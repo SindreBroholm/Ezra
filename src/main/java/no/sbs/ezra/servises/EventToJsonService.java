@@ -128,7 +128,6 @@ public class EventToJsonService {
         object.put("location", ed.getLocation());
         object.put("description", ed.getMessage());
         object.put("boardName", ed.getBoard().getName());
-        object.put("display", "list-item");
     }
 
 }

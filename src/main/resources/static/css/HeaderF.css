@@ -44,8 +44,14 @@
         background: #fff;
     }
 
-    .navbar .navbar-brand, .navbar .nav-link {
+    .navbar .navbar-brand, .navbar .nav-link{
         color: #555;
+    }
+    .navbar .nav-link:focus, .navbar .nav-link:visited{
+        color: #555
+    }
+    #logoutForm{
+        margin-left: 0;
     }
 }
 

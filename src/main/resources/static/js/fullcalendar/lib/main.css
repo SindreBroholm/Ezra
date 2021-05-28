@@ -456,6 +456,7 @@ When it's NOT activated, the fc-button classes won't even be in the DOM.
     opacity: var(--fc-bg-event-opacity, 0.3)
   }
 .fc .fc-bg-event .fc-event-title {
+
       margin: .5em;
       font-size: .85em;
       font-size: var(--fc-small-font-size, .85em);
@@ -577,10 +578,10 @@ A HORIZONTAL event
 */
 .fc-h-event { /* allowed to be top-level */
   display: block;
-  border: 1px solid #3788d8;
-  border: 1px solid var(--fc-event-border-color, #3788d8);
-  background-color: #3788d8;
-  background-color: var(--fc-event-bg-color, #3788d8)
+  border: 1px solid #00A99D;
+  border: 1px solid var(--fc-event-border-color, #00A99D);
+  background-color: #00A99D;
+  background-color: var(--fc-event-bg-color, #00A99D)
 
 }
 .fc-h-event .fc-event-main {
@@ -681,10 +682,10 @@ A HORIZONTAL event
     font-size: 1.1em;
   }
 .fc-theme-standard .fc-popover {
-    border: 1px solid #ddd;
-    border: 1px solid var(--fc-border-color, #ddd);
-    background: #fff;
-    background: var(--fc-page-bg-color, #fff);
+    border: 1px solid #555;
+    border: 1px solid var(--fc-border-color, #555);
+    background: #555;
+    background: var(--fc-page-bg-color, #555);
   }
 .fc-theme-standard .fc-popover-header {
     background: rgba(208, 208, 208, 0.3);
@@ -713,8 +714,8 @@ A HORIZONTAL event
     z-index: 1; /* container inner z-index's because <tr>s can't do it */
   }
 .fc .fc-daygrid-day.fc-day-today {
-      background-color: rgba(255, 220, 40, 0.15);
-      background-color: var(--fc-today-bg-color, rgba(255, 220, 40, 0.15));
+      background-color: rgba(122, 88, 173, 0.25);
+      background-color: var(--fc-today-bg-color, rgba(122, 88, 173, 0.25));
     }
 .fc .fc-daygrid-day-frame {
     position: relative;
@@ -886,7 +887,7 @@ color: #fff
   }
 .fc-daygrid-block-event .fc-event-time,
   .fc-daygrid-block-event .fc-event-title {
-    color: #fff
+    color: #fff;
     padding: 1px;
   }
 /* --- the dot style of event --- */
@@ -1244,7 +1245,7 @@ A VERTICAL event
   }
 .fc-timegrid-event .fc-event-time {
     white-space: nowrap;
-    color: #fff
+    color: #fff;
     font-size: .85em;
     font-size: var(--fc-small-font-size, .85em);
     margin-bottom: 1px;
